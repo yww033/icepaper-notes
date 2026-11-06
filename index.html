@@ -68,7 +68,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line
   <div class="wrap">
     <div class="kicker">Paper Close Reading</div>
     <h1>論文研讀批注</h1>
-    <p>每篇論文都整理成雙欄批注：左欄是原文與五色高亮，右欄是逐段的功能、邏輯角色與論證漏洞分析，最後附上全文的論證結構總覽。</p>
+    <p>每篇論文都整理成雙欄批注：左欄是原文節錄（期刊論文則為英文重述）與五色高亮，右欄是逐段的功能、邏輯角色與論證漏洞分析，最後附上全文的論證結構總覽。</p>
     <div class="legend" aria-label="高亮顏色說明">
       <span><i style="background:#fff0a3;box-shadow:inset 0 -2px 0 #d9a800"></i>核心論點</span>
       <span><i style="background:#fbd3cc;box-shadow:inset 0 -2px 0 #c4402c"></i>關鍵概念</span>
@@ -102,6 +102,21 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line
    2) 在下面 PAPERS 陣列最前面複製一個 { ... } 區塊，改成新論文的資料
    ============================================================ */
 const PAPERS = [
+  {
+    file: "papers/2024-vgc-gan-stock-prediction.html",
+    title: "VGC-GAN：以多圖卷積對抗網路預測股價",
+    titleEn: "VGC-GAN: A multi-graph convolution adversarial network for stock price prediction",
+    author: "Dongbo Ma, Da Yuan, Maojun Huang, Ling Dong",
+    advisor: "",
+    school: "Expert Systems with Applications 236 (2024) 121204",
+    type: "期刊論文",
+    year: 2024,
+    lang: "英文",
+    tags: ["機器學習", "股價預測", "圖神經網路", "GAN", "時間序列分解"],
+    summary: "只用歷史股價建立 Pearson、Spearman、FastDTW 三種度量 × 全局／局部共 6 張關聯圖，搭配 VMD 分解與 WGAN-GP＋MSE 訓練（Multi-GCN＋GRU 生成器），在 ETF、上證 50、道瓊三個資料集上預測隔日收盤價。",
+    paragraphs: 40,
+    added: "2026-11-06"
+  },
   {
     file: "papers/2022-auto-feature-dataset-shift.html",
     title: "自動特徵生成方法與資料集偏移問題於財務機器學習模型探討",
