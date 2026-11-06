@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>論文雙欄批注</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#14213d; --navy-2:#22325a; --navy-ink:#e9ecf3;
+  --paper:#faf7f0; --card:#fffdf8; --ink:#2b2924; --muted:#706a5c; --line:#ddd5c3;
+  --zh-bg:#f0ece2; --zh-rule:#b5a682;
+  --y:#fff0a3; --y-b:#d9a800; --y-bg:#fffaf0;
+  --r:#fbd3cc; --r-b:#c4402c; --r-bg:#fdf3f1;
+  --b:#d5e6fb; --b-b:#2c6db3; --b-bg:#f2f7fd;
+  --g:#d5efd7; --g-b:#358a45; --g-bg:#f2f9f2;
+  --p:#e8dcf8; --p-b:#7449b0; --p-bg:#f7f2fd;
+  --ui:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif;
+  --serif:"Lora","Noto Serif TC",Georgia,serif;
+  --zh:"Noto Serif TC","Songti TC",serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* ===== 頂部導航 ===== */
+.top{background:var(--navy);color:var(--navy-ink);padding:22px 0 18px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+.top .home{display:inline-block;color:#cdd3e2;text-decoration:none;font-size:13px;margin-bottom:12px;border-bottom:1px dotted rgba(255,255,255,.35)}
+.top .home:hover{color:#fff}
+.top .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.top h1{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.6vw,28px);line-height:1.35;margin:6px 0 4px}
+.top .en-title{font-family:"Lora",serif;font-style:italic;font-size:15px;opacity:.85}
+.top .meta{font-size:13px;opacity:.75;margin-top:8px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.legend .lbl{font-size:12px;opacity:.7;margin-right:4px}
+.legend button{font:500 12.5px var(--ui);border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--navy-ink);
+  padding:5px 10px 5px 8px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.legend button i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.legend button[aria-pressed="false"]{opacity:.4;text-decoration:line-through}
+.legend .hint{font-size:11.5px;opacity:.55;margin-left:6px}
+
+/* ===== 章節導航（sticky） ===== */
+.secnav{position:sticky;top:0;z-index:20;background:var(--navy-2);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.secnav .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
+.secnav .wrap::-webkit-scrollbar{display:none}
+.secnav a{flex:none;text-decoration:none;color:#cdd3e2;font-size:13px;padding:6px 11px;border-radius:6px;white-space:nowrap}
+.secnav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.secnav a.on{background:#fff;color:var(--navy);font-weight:600}
+
+/* ===== 說明框 ===== */
+.intro{margin:28px auto 8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;font-size:14px;line-height:1.75;color:#4a463c}
+.intro b{color:var(--ink)}
+.intro ul{margin:6px 0 0;padding-left:20px}
+
+/* ===== 欄位標題 ===== */
+.colhead{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:32px;margin-top:26px;
+  font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--navy);padding-bottom:8px}
+
+/* ===== 章節 ===== */
+.sec{padding-top:10px}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin:38px 0 4px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sec-h .num{font:600 13px var(--ui);color:#fff;background:var(--navy);border-radius:5px;padding:3px 9px}
+.sec-h h2{margin:0;font-family:var(--zh);font-weight:600;font-size:22px}
+.sec-h .en{font-family:"Lora",serif;font-style:italic;color:var(--muted);font-size:15px}
+.sec-sum{font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.7}
+
+/* ===== 段落列 ===== */
+.row{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:32px;padding:24px 0;border-bottom:1px dashed var(--line)}
+.pno{font:500 12px var(--ui);color:var(--muted);letter-spacing:.04em;margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pno .id{font-weight:600;color:var(--navy)}
+.pno .src-tag{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:#fff}
+.pno .src-tag.orig{border-color:#c9b98f;background:#fbf6e6;color:#7a6326}
+p.en{font-family:"Lora",Georgia,serif;font-size:16.5px;line-height:1.78;margin:0;color:#25231f;hyphens:auto}
+p.orig{font-family:var(--zh);font-size:16.5px;line-height:2.05;margin:0;color:#25231f;text-align:justify}
+.ab-en{background:var(--zh-bg);border-left:2px solid var(--zh-rule);padding:12px 16px;font-family:"Lora",Georgia,serif;font-size:15px;line-height:1.75;color:#3b372e;border-radius:0 4px 4px 0}
+.ab-lbl,.tbl-lbl{display:block;font:600 11px var(--ui);letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.tbl{margin-top:14px;background:var(--b-bg);border:1px solid #cfe0f5;border-radius:6px;padding:9px 13px;font:13.5px/1.75 var(--ui);color:#23476f}
+.tbl .tbl-lbl{color:#2c6db3}
+hr.sep{border:0;border-top:1px solid var(--line);margin:14px 0}
+.zh{background:var(--zh-bg);border-left:2px solid var(--zh-rule);padding:12px 16px;font-family:var(--zh);font-size:15.5px;line-height:1.95;color:#3b372e;margin:0;border-radius:0 4px 4px 0}
+
+mark{color:inherit;padding:0 .12em;border-radius:2px;background:none;transition:background .2s, box-shadow .2s}
+mark.t{background:var(--y);box-shadow:inset 0 -2px 0 var(--y-b)}
+mark.k{background:var(--r);box-shadow:inset 0 -2px 0 var(--r-b)}
+mark.e{background:var(--b);box-shadow:inset 0 -2px 0 var(--b-b)}
+mark.c{background:var(--g);box-shadow:inset 0 -2px 0 var(--g-b)}
+mark.m{background:var(--p);box-shadow:inset 0 -2px 0 var(--p-b)}
+body.off-t mark.t, body.off-k mark.k, body.off-e mark.e, body.off-c mark.c, body.off-m mark.m{background:none;box-shadow:none}
+
+/* ===== 批注卡片 ===== */
+.note{align-self:start;border-left:4px solid var(--nb);background:var(--nbg);border-radius:0 8px 8px 0;padding:14px 16px 12px;font-size:14px;line-height:1.72;color:#37342c}
+.n-t{--nb:var(--y-b);--nbg:var(--y-bg)} .n-k{--nb:var(--r-b);--nbg:var(--r-bg)} .n-e{--nb:var(--b-b);--nbg:var(--b-bg)}
+.n-c{--nb:var(--g-b);--nbg:var(--g-bg)} .n-m{--nb:var(--p-b);--nbg:var(--p-bg)}
+.note .fn{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.note .fn .chip{font:600 11px var(--ui);letter-spacing:.06em;color:#fff;background:var(--nb);padding:2px 8px;border-radius:4px}
+.note .fn strong{font-size:15px;font-family:"Noto Sans TC",var(--ui)}
+.note dl{margin:0}
+.note dt{font:600 11.5px var(--ui);color:var(--muted);letter-spacing:.06em;margin-top:8px}
+.note dd{margin:2px 0 0}
+.note .flaw{color:#8a2f20}
+.note .tech{color:#255d2f}
+
+/* ===== 總覽 ===== */
+.map{margin:56px 0 30px;padding:30px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.map h2{font-family:var(--zh);font-size:24px;margin:0 0 6px}
+.map .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+.chain{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;position:relative}
+.step{background:#fff;border:1px solid var(--line);border-top:5px solid var(--sb);border-radius:8px;padding:14px 14px 12px;font-size:13.5px;line-height:1.7;position:relative}
+.step h3{margin:0 0 6px;font-size:15px;font-family:"Noto Sans TC",var(--ui);display:flex;justify-content:space-between;align-items:baseline}
+.step h3 small{font:500 11px var(--ui);color:var(--muted);letter-spacing:.08em}
+.step ul{margin:0;padding-left:16px}
+.step li{margin:3px 0}
+.step a{color:var(--navy);text-decoration:none;border-bottom:1px dotted var(--navy);font-size:12px}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;background:var(--card);line-height:1}
+.oneline{margin:26px 0 18px;padding:18px 22px;background:var(--navy);color:#fff;border-radius:10px;font-family:var(--zh);font-size:17px;line-height:1.8}
+.oneline span{display:block;font:600 11px var(--ui);letter-spacing:.14em;opacity:.65;margin-bottom:4px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs div{border-radius:8px;padding:16px 18px;font-size:14px;line-height:1.75}
+.vs .strong{background:var(--g-bg);border-left:4px solid var(--g-b)}
+.vs .weak{background:var(--r-bg);border-left:4px solid var(--r-b)}
+.vs h4{margin:0 0 6px;font-size:15px}
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px;line-height:1.7}
+
+@media (max-width:900px){
+  .wrap{padding:0 16px}
+  .row,.colhead{grid-template-columns:1fr;gap:14px}
+  .colhead .r{display:none}
+  .chain{grid-template-columns:1fr}
+  .step:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-15px;transform:translateX(50%)}
+  .vs{grid-template-columns:1fr}
+  .map{padding:20px 16px}
+  p.en{font-size:16px}
+}
+@media print{.secnav{position:static}.legend button{border-color:#999}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="home" href="../index.html">← 回論文批注首頁</a>
+    <div class="kicker">Thesis Close Reading · 雙欄論證批注</div>
+    <h1>自動特徵生成方法與資料集偏移問題於財務機器學習模型探討</h1>
+    <div class="en-title">Automatic Feature Generation and Insight of Dataset Shift in Finance Machine Learning Models</div>
+    <div class="meta">國立陽明交通大學 資訊管理與財務金融學系 財務金融碩士班 · 碩士論文（2022 年 7 月）· 研究生 白建濠 · 指導教授 戴天時</div>
+    <div class="legend" role="group" aria-label="顏色圖例">
+      <span class="lbl">分析維度</span>
+      <button data-k="t" aria-pressed="true"><i style="background:var(--y);box-shadow:inset 0 -2px 0 var(--y-b)"></i>核心論點 Thesis</button>
+      <button data-k="k" aria-pressed="true"><i style="background:var(--r);box-shadow:inset 0 -2px 0 var(--r-b)"></i>關鍵概念／術語</button>
+      <button data-k="e" aria-pressed="true"><i style="background:var(--b);box-shadow:inset 0 -2px 0 var(--b-b)"></i>實證證據／數據</button>
+      <button data-k="c" aria-pressed="true"><i style="background:var(--g);box-shadow:inset 0 -2px 0 var(--g-b)"></i>讓步／反駁處理</button>
+      <button data-k="m" aria-pressed="true"><i style="background:var(--p);box-shadow:inset 0 -2px 0 var(--p-b)"></i>方法論說明</button>
+      <span class="hint">點選可開關該類高亮</span>
+    </div>
+  </div>
+</header>
+
+<nav class="secnav" aria-label="章節導航">
+  <div class="wrap">
+    <a href="#abs">摘要</a>
+    <a href="#s1">壹 緒論</a>
+    <a href="#s2">貳 文獻回顧</a>
+    <a href="#s3">參 資料敘述</a>
+    <a href="#s4">肆 研究方法</a>
+    <a href="#s5a">伍-1 保險實驗</a>
+    <a href="#s5b">伍-2 洗錢實驗</a>
+    <a href="#s5c">伍-3 配對交易</a>
+    <a href="#s6">陸 結論</a>
+    <a href="#map">論證結構總覽</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<div class="intro">
+  <b>閱讀說明</b>
+  <ul>
+    <li><b>左欄是作者原文：</b>本論文以中文撰寫，左欄節錄作者的中文原句（「……」為省略處），五色高亮直接畫在原文上。只修正了少數明顯錯字（例如「實我們的驗」→「我們的實驗」），其餘用字保持原樣，可以直接對照 PDF 引用。</li>
+    <li><b>摘要（¶1–¶4）</b>另外附上作者自己寫的英文摘要對應段落（米色區塊）。</li>
+    <li><b>藍色「表格數據」框</b>是從表一至表三十五摘錄的關鍵數字，不是原文句子。</li>
+    <li><b>涵蓋範圍：</b>全文 74 頁，精選 54 個論證段落。</li>
+    <li><b>批注卡片顏色</b>對應該段的主要論證功能（黃＝論點、紅＝概念、藍＝證據、綠＝讓步／反駁、紫＝方法）。批注中 <span class="flaw" style="color:#8a2f20">紅字</span> 是潛在漏洞，<span style="color:#255d2f">綠字</span> 是值得學習的論證技巧。</li>
+  </ul>
+</div>
+
+<div class="colhead"><div>作者中文原文（節錄・高亮）＋ 表格數據</div><div class="r">中文批注 · 功能／角色／技巧與漏洞</div></div>
+
+<!-- ================= 摘要 ================= -->
+<section class="sec" id="abs">
+  <div class="sec-h"><span class="num">ABS</span><h2>摘要</h2><span class="en">Abstract</span></div>
+  <p class="sec-sum">全文的「微型論證」：三個子議題（特徵生成、偏移導向的特徵選擇、樣本權重）在此一次排開。</p>
+
+  <article class="row" id="p1">
+    <div>
+      <div class="pno"><span class="id">¶1</span>Abstract · 第一段<span class="src-tag orig">作者中文摘要＋英文摘要</span></div>
+      <p class="orig">隨著計算機技術的發展，機器學習模型的應用逐漸演變成業界十分注重的議題之一。為了能使模型更能符合應用的目的，機器學習的建模需要盡可能地提高其預測的精確度，且同時要能夠泛化至不同的資料集。……在此之中，<mark class="t"><mark class="k">特徵工程</mark>是連結機器學習模型以及領域知識的一大橋梁，往往是影響模型能力的決定性因子</mark>，故在這篇論文中，我們會進一步探討各種特徵工程的議題，並且從嘗試這些議題中提升模型的表現。</p>
+      <hr class="sep">
+      <div class="ab-en"><span class="ab-lbl">作者英文摘要（對應段落）</span>Today, applying machine learning techniques to solve the company’s problem is one of the biggest application issues in machine learning, feature engineering becoming the connection between the machine learning application and domain knowledge. Therefore, we will discuss some feature engineering issues and try to improve the model’s performance in this paper.</div>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>界定主題・引出問題</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文起點，把「特徵工程」立為貫穿三個案例的主軸，後面每個實驗都回扣「特徵怎麼表示、怎麼篩選」。</dd>
+      <dt>技巧／漏洞</dt><dd class="flaw">從「特徵工程很重要」直接用「故」跳到研究目的，中間沒有指出既有研究的缺口（英文摘要的「Therefore」也是同樣的跳躍）。「提升模型的表現」也沒說用什麼指標衡量（後文才知道是 F1）。</dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p2">
+    <div>
+      <div class="pno"><span class="id">¶2</span>Abstract · 第二段<span class="src-tag orig">作者中文摘要＋英文摘要</span></div>
+      <p class="orig">在處理不同的應用情景時，會需要考慮多個面向：特徵的表示方式、特徵對目標任務的影響力以及資料不平衡問題的處理。適當的特徵表示方式可以增加該特徵對於目標任務的相關性，同時提升模型的效能。<mark class="c">雖然如此，我們卻很難完整地找出所有可能的特徵表示方法</mark>因此，在這篇論文中，<mark class="t">我們將運用</mark><mark class="k">特徵自動生成</mark><mark class="t">的方法，利用資料表格之間的關聯性，再經由函數的轉換，建構出多個不同的特徵來增加模型的複雜度</mark>，讓模型能從資料中更好地從有限的資料中學習到有用的訊息。</p>
+      <hr class="sep">
+      <div class="ab-en"><span class="ab-lbl">作者英文摘要（對應段落）</span>While constructing a machine learning model, researchers must find the appropriate representative way of the features that can improve the influence of the attribute on the objectives. However, it is unlikely that researchers will find all the features in properly representative ways; thus, we introduce an automatic feature generation method to make feature engineering more complete.</div>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>提出子論點一（DFS）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>「人工有極限 → 自動生成補足」，是三條主線中的第一條。它預先替後文的「underfitting（欠擬合）診斷 → 用 DFS 補資訊」鋪路。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">先承認人工方法的極限，再提出解方，是標準的「缺口 → 填補」句式。</span><span class="flaw">「增加模型的複雜度」暗示特徵越多越好，跟第三段「刪除有害特徵」有張力。作者到結論才用「先補資訊、再去偏移」把兩者調和起來。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p3">
+    <div>
+      <div class="pno"><span class="id">¶3</span>Abstract · 第三段<span class="src-tag orig">作者中文摘要＋英文摘要</span></div>
+      <p class="orig">另一方面，由過往的研究可以得知，並非所有特徵對於模型的泛化能力皆有所幫助，甚至可能會誤導模型的訓練過程，<mark class="k">其中更有部分特徵會使模型在訓練集上可以很好地捕捉到某些態樣，然而在測試集上卻不存在這種特徵與目標間的關係性</mark>……因此我們考慮運用 <mark class="m">Kolmogorov-Smirnov test</mark>，<mark class="t">透過檢定測試集和訓練集特徵的分布差異，用以剔除掉在訓練集和測試集的分佈有所差異之特徵，作為機器學習的特徵選擇方法</mark>，以此方法便能避開資料集的問題，提升模型在預測中的泛化能力。其中，為了能夠再更進一步地觀察 Kolmogorov-Smirnov test 的效果，我們針對訓練集和測試集的所有特徵資料（不包含預測目標 label）進行 <mark class="m">Discriminative Learning</mark> 方式檢驗資料集偏移問題，用以觀察訓練集和測試集的分佈是否相同。</p>
+      <hr class="sep">
+      <div class="ab-en"><span class="ab-lbl">作者英文摘要（對應段落）</span>On the other hand, feature selection is an important process for selecting informative features. When analyzing a dataset, as not all features are necessary, researchers must determine which attributes are most relevant to the response variable. Here, we consider that dataset shift may deteriorate the performance of the machine learning model; in this paper, we suggest taking into account the difference of the pattern between training and testing, which the selection of features can be proxied by examining the similarity of their probability distributions with the Kolmogorov-Smirnov test. Since features with different patterns between training and testing may cause a dataset shift, removing these noisy features could significantly improve the performance of the model. To see the effect of features dropped by the Kolmogorov-Smirnov test, we will use discriminative learning to check the difference in the pattern between training and testing.</div>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>核心論點（全文主命題）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>本文最原創的主張：<b>把「分佈穩定性」當成特徵選擇的準則</b>，而不只看特徵與目標的相關性。KS 是處方，判別式學習是驗證工具，兩者構成「介入＋檢驗」的閉環。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">用獨立的檢驗工具（判別式學習）驗證介入的效果，不只看最終 F1，設計上很周全。</span><span class="flaw">中文摘要把問題寫成「特徵與目標間的關係在測試集不存在」，這其實是概念偏移（concept shift，P(y|x) 改變）；但 KS 只比較特徵本身的邊際分佈 P(x)，問題定義與工具並不對應。英文摘要寫「could significantly improve」，在保險資料上其實沒有成立（見 ¶37），屬過度承諾。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p4">
+    <div>
+      <div class="pno"><span class="id">¶4</span>Abstract · 第四段<span class="src-tag orig">作者中文摘要＋英文摘要</span></div>
+      <p class="orig">此外，在我們的資料集中存在著<mark class="k">資料不平衡</mark>的問題，處理此一問題的作法可以採用重複抽樣的方法對資料集進行調整……但從另一個角度思考，<mark class="t">重複抽樣方法就如同於賦予各個資料不同的損失函數權重，將資料量大的類別賦予較小的權重，同時資料量小的類別賦予較大的權重</mark>，進一步影響模型的參數調整。……藉由改變權重設定來做 <mark class="k">cost-sensitive learning</mark>，希望透過更改權重的方式讓模型的訓練能夠找到最適解，並因此提高模型的準確度。</p>
+      <hr class="sep">
+      <div class="ab-en"><span class="ab-lbl">作者英文摘要（對應段落）</span>Last but not least, as the imbalanced dataset problem will degrade the classification performance, the resampling method, which replicates the samples of minority classes, is an important preprocessing skill for researchers to solve this problem. However, from another concept, we can see the resample as modifying the learning weight of the data during the learning process. In this paper, we introduce weighted cross entropy and cost-sensitive learning to modify sample weights, which can also be a solution to the imbalanced dataset problem.</div>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論說明・子論點三</strong></div>
+      <dl><dt>邏輯角色</dt><dd>第三條主線（樣本權重）。跟前兩條相比較為獨立，主要為後面驗證並反駁 Khan et al.（2017）做準備。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">把「重抽樣」重新詮釋為「損失權重」，是漂亮的概念轉換，讓兩種方法可以放在同一尺度上比較。</span><span class="flaw">摘要完全沒交代三條主線的實證結果，讀者看不到結論，只看到研究計畫。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 壹 緒論 ================= -->
+<section class="sec" id="s1">
+  <div class="sec-h"><span class="num">壹</span><h2>緒論</h2><span class="en">Introduction</span></div>
+  <p class="sec-sum">界定兩大問題（資料集偏移、特徵表示不完整），並交代三個案例、方法藍圖與結果預告。</p>
+
+  <article class="row" id="p5">
+    <div>
+      <div class="pno"><span class="id">¶5</span>緒論 · 第一段<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">機器學習的模型在訓練時，<mark class="k">若特徵在訓練集與測試集分佈具有顯著差異時，則會導致模型在訓練集學習到的結果，在測試集未能有良好的表現能力，這正是所謂的資料集偏移問題</mark>。此外，在建模過程中所使用的特徵裡，可能存在能夠改善模型表現但仍未被發現且應用的特徵表示方法，這些方法在我們人工製做的特徵工程上可能會難以被捕捉到，<mark class="t">但若使用自動特徵生成方法則可以藉由特徵之間的相關資訊來進行特徵表示方法的擴展，便能夠解決此一問題</mark>。因此，在我們這篇論文裡，會研究三個不同方向的研究案例，分別是<mark class="e">保單成交預測、金融帳戶洗錢偵測以及配對交易策略預測</mark>等財金領域上的機器學習應用和特徵工程議題。</p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>定義核心概念・設定場域</strong></div>
+      <dl><dt>邏輯角色</dt><dd>給出「資料集偏移」的操作型定義（特徵分佈不同），並宣告用三個異質案例檢驗同一套方法，是在為「外部效度」鋪路。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">這裡把資料集偏移等同於「特徵分佈不同」（covariate shift），但沒區分 prior shift 和 concept shift。後面的法規事件其實更像 P(y|x) 的改變，而 KS 原理上處理不了這種偏移。而且這個定義和中文摘要（¶3：特徵與目標的關係改變）並不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p6">
+    <div>
+      <div class="pno"><span class="id">¶6</span>緒論 · 第二段<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在本次實驗裡，我們在資料集偏移問題的研究，是在各個研究案例下做完特徵工程後，<mark class="m">使用 Kolmogorov-Smirnov Test 特徵選擇移除掉訓練集和測試集分佈差異顯著的特徵</mark>，以此處理資料集偏移問題，之後再比較 Kolmogorov-Smirnov Test 特徵選擇前後的模型表現能力差異。最終以 <mark class="k">Discriminative Learning</mark> 來分析及檢驗資料集偏移的狀況。……<mark class="m">將訓練集和測試集中各抽樣 3/4 的資料集，並標記各個樣本資料是來自訓練集或是測試集部分，並以此資料集建構一個分類模型來判斷該筆資料是訓練集的資料抑或是測試集的資料。之後再運用訓練集和測試集中剩餘的 1/4 的資料集進行驗證</mark>，若模型能較清楚地分出訓練集的資料或是測試集的資料，則表示有資料集偏移的問題……在特徵自動生成架構中，我們則是參照 James et al.(2015) 的 <mark class="k">Deep Features Synthesis</mark> 方法，其概念是在資料有多個表格時，會透過資料表格之間的關聯性進行特徵合成</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論藍圖</strong></div>
+      <dl><dt>邏輯角色</dt><dd>交代「處方（KS）＋療效檢驗（判別式學習）＋增補（DFS）」三件工具，對應摘要的兩個子論點。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">判別式學習是對抗式驗證（adversarial validation）的學術版本，用模型能力直接量化偏移，比逐一看 p 值更有整體性。</span><span class="flaw">判別分類器的 F1 會受訓練集與測試集樣本數比例影響，跨實驗比較 F1 時需要校正（見 ¶48）。另外，這裡把 DFS 引為「James et al.(2015)」，參考文獻與 ¶40 卻寫 Kanter &amp; Veeramachaneni (2015)，引用前後不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p7">
+    <div>
+      <div class="pno"><span class="id">¶7</span>緒論 · 第三段<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在我們特徵工程的實驗部分，由於已成交保單以及警示帳戶的資料量較少，故資料集有不平衡的問題。所以在保單資料上，<mark class="m">我們會嘗試採用 Over-sampling 的方式解決資料不平衡的問題，同時考慮 weighted cross entropy 亦可以處理不平衡資料集問題</mark>……另外參考 Khan et al.(2015) 的論文提出的 CNN 下 Proposed cost-sensitive learning 方法，將該文獻所提出的動態更新樣本權重之想法應用至我們的機器學習模型中。……此外，對於模型的初次實驗，我們會先針對類別變數進行 One hot encoding，<mark class="m">接著再嘗試對這個資料集中具有順序性的類別特徵運用 One hot encoding、label encoding、target encoding</mark>，並分析與比較不同編碼下對模型表現的影響。……故我們嘗試運用 Deep Feature Synthesis 自動特徵生成的方式，產生多個特徵，增加模型的學習複雜度……我們採取了 AutoEncoder 方式進行資料降維的實驗</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>實驗清單</strong></div>
+      <dl><dt>邏輯角色</dt><dd>列出保險案例的全部實驗分支。可以看出保險資料是「主實驗場」，另外兩個案例主要用來佐證。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">實驗分支很多（不平衡處理 3 種 × 編碼 3 種 × 降維 × DFS × KS），但每個分支都只做單次切分、單次訓練，沒有重複實驗或信賴區間，「顯著」的說法缺少統計支撐。Khan et al. 在這裡寫成 2015 年，其他地方都是 2017 年。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p8">
+    <div>
+      <div class="pno"><span class="id">¶8</span>緒論 · 第四段<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">經過我們的實驗發現，<mark class="e">在金融帳戶資料上，透過 Kolmogorov-Smirnov test 做完特徵選擇後，模型的表現著實有顯著地提升</mark>，而在配對交易資料上，<mark class="e">我們可以發現訓練集和測試集的分佈相同的特徵，對於尋找最佳交易模式可以有更好的報酬</mark>。<mark class="c">而在保險的資料上，我們卻得到做完 Kolmogorov-Smirnov test 的特徵選擇後模型的表現並未有明顯改進的結果，然而再由 Discriminative Learning 檢測並發現到其中的原因可能是源於測試集的時間上，有 2020 年 7 月金管會提出的健全保險商品結構規範出現促使資料分佈有所改變</mark>，使得儲蓄險保單的銷售內容受到一定程度上的限制。</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>預告結果・預先讓步</strong></div>
+      <dl><dt>邏輯角色</dt><dd>先承認反例（保險資料沒有改善），再立刻給出解釋（法規事件），把潛在的反駁轉成「論點適用條件」的補充。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">在緒論就主動處理不利結果，可信度比事後補救高。</span><span class="flaw">但這個解釋是看到結果之後才提出的（post-hoc），並非事前假設；而且法規改變的是購買行為本身，用剔除特徵來應對，本質上可能並不對症。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 貳 文獻回顧 ================= -->
+<section class="sec" id="s2">
+  <div class="sec-h"><span class="num">貳</span><h2>文獻回顧</h2><span class="en">Literature Review</span></div>
+  <p class="sec-sum">前三篇對應三個案例的「基準」，後四篇對應四件方法工具。整章以「引用＋借用」為主，批判性對話較少。</p>
+
+  <article class="row" id="p9">
+    <div>
+      <div class="pno"><span class="id">¶9</span>文獻 · Wang (2020)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在 Wang (2020)，作者主要討論在汽車保險上的特徵建構，並且建立機器學習模型預測保險人是否會續保。……<mark class="e">由表一可以看出模型在測試集的 F1-Score 約為 0.34</mark>。另外，作者列出了特徵重要性後發現到，對於汽車保險是否續約，汽車價格、車齡、汽車類型、汽車使用目的等，會是較為重要的特徵。然而在我們這次的研究裡，我們的資料集主要是人身保險部份，因此藉由這篇論文，<mark class="m">我們引用其中的保險種類、被保人年齡、保費、保額、保險三標作為特徵初步的建構</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表一（Wang 2020）Recall／F1／AUC：Random Forest 0.802／0.347／0.736｜GBDT 0.823／0.227／0.789｜LightGBM 0.828／0.312／0.805</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>建立比較基準</strong></div>
+      <dl><dt>邏輯角色</dt><dd>F1≈0.34 這個數字之後被當成「預期表現」的參照（例如 Learning Curve 以 0.4 判定 underfitting）。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">汽車續保與壽險新單成交是不同任務，正例比例也不同，F1 不能直接跨研究比較。拿它當基準，隱含一個未經檢驗的可比性假設。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p10">
+    <div>
+      <div class="pno"><span class="id">¶10</span>文獻 · 辛宥言 (2021)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在辛宥言(2021)，作者嘗試藉由帳戶、交易頻率、異常偵測方法和交易類型，建構新的特徵。之後比較他所建構的新特徵以及過往文獻所運用的特徵在模型表現上的效果，<mark class="e">發現到他所建構的新特徵更能夠讓模型要較好的預測能力</mark>……<mark class="e">而其中 WGAN 相關方法對模型的幫助較大</mark>。在作者的研究中，<mark class="t">他亦發現到當他將過往文獻的特徵進行 Kolmogorov-Smirnov test，捨棄掉訓練集與測試集分佈不同的特徵，能讓模型有較佳的表現</mark>。綜上所述，在我們的研究中，我們會分別對這篇論文提出的特徵和過往文獻提出的特徵，進行特徵自動生成，嘗試進一步提升模型的預測能力。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>前人證據・論點的起源</strong></div>
+      <dl><dt>邏輯角色</dt><dd>本文「KS 特徵選擇」的想法其實來自同實驗室的前作；這一段讓核心論點有了先行實證。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">前作與本文用的是同一份資料，後文在這份資料上「再次證實」KS 有效（¶47），獨立性有限，比較接近複製而非外部驗證。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p11">
+    <div>
+      <div class="pno"><span class="id">¶11</span>文獻 · 郭瑋倫 (2021)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在郭瑋倫(2021)，作者主要運用價差過程的<mark class="k">共整合</mark>性質，提出了由此建構一組股票的配對組合，只要當價差過程下降(或上升)至某一門檻，則我們應當買進(或賣出)該投資組合。……其中，<mark class="m">作者提出兩階段模型，第一階段模型為對所有股票配對中找出最適的開倉和停損門檻，第二階段為預測此配對投組(搭配上述交易門檻)的獲利能力</mark>，並且停止交易無獲利能力的投組。根據這篇論文，<mark class="m">我們考慮運用三種不同的特徵：價差過程、價格過程、報酬率過程來訓練捲積神經網路模型，並且藉由 Kolmogorov-Smirnov test 解釋此三種特徵下的模型表現結果</mark>。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>第三案例的方法來源</strong></div>
+      <dl><dt>邏輯角色</dt><dd>配對交易在全文中的角色是「不同特徵表示 ↔ 分佈穩定性 ↔ 報酬」的佐證案例。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">共整合的價差本來就被設計成平穩序列，價格和報酬過程則不是；所以「價差分佈較穩定」幾乎是定義上必然的結果，用來佐證 KS 的解釋力有循環論證之嫌。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p12">
+    <div>
+      <div class="pno"><span class="id">¶12</span>文獻 · Bickel (2007); Nair et al. (2019)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在 Bickel (2007) 和 Nair. et al. (2019) 論文中，作者提出能夠檢驗訓練及和測試集分佈是否有差異的方法，<mark class="m">此方法是先將所有資料切分成訓練集（寫作 tr1）和測試集（寫作 ts1）並且在 tr1 和 ts1 裡各隨機抽樣 3/4 的樣本點統合作為 discriminative learning 的訓練集（寫作 tr2），而 tr1 和 ts1 裡各剩下 1/4 的樣本點統合作為 discriminative learning 的測試集（寫作 ts2）</mark>。……如果模型能很好地在 ts2 上分類出資料點是來自 tr1 或 ts1，則表示 tr1 和 ts1 的特徵分佈差異甚大，使模型能從中區分。<mark class="k">因此表示這些特徵會有 covariate shift 的問題</mark>。故我們所採取的對 covariate shift 問題檢測方法，運用機器學習判斷 ts2 的資料點來自 tr1 或 tr2，所得到的 F1-Score 進行診斷。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>檢驗工具定義</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這是全文的「量尺」：之後所有「偏移減緩」的主張，都以判別 F1 下降為證據。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">F1 會受 tr1 與 ts1 樣本數比例影響；AUC 或與隨機基準的差距才是比較穩健的指標。另外，當特徵數變多時，判別器只要靠任何一個時間相關特徵（例如「最後異動年份」）就能分辨來源，判別 F1=1.0 未必代表「整體」偏移很嚴重。原文最後一句寫「判斷 ts2 的資料點來自 tr1 或 tr2」，應為 tr1 或 ts1，是筆誤。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p13">
+    <div>
+      <div class="pno"><span class="id">¶13</span>文獻 · Pettitt &amp; Stephens (1977)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="c">另外我們資料的特徵很多是類別資料，而 Kolmogorov-Smirnov test 的應用是在連續變數的分佈差異檢定</mark>。因此為了能證實 Kolmogorov-Smirnov test 在類別資料上的適用性，我們參考了 Pettitt and Stephens (1977) 的方法，<mark class="c">論文中給出了證明了類別資料可以視作是數個相異的直方圖的分箱（the equal cell case），並且可由直方圖分箱計算其累積機率分佈，如此便能將類別變數視為如同連續變數的計算方式</mark>。<mark class="m">故我們亦能運用 Kolmogorov-Smirnov test 對類別特徵做特徵選擇。</mark></p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>預先反駁方法上的異議</strong></div>
+      <dl><dt>邏輯角色</dt><dd>先預想審查者會問「KS 能用在類別變數嗎？」，再引權威文獻擋下，替後續大量 one-hot 特徵的 KS 篩選取得合法性。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">預先處理異議是好習慣。</span><span class="flaw">但 Pettitt &amp; Stephens 的重點其實是：離散資料下若沿用連續情況的臨界值，檢定會偏保守，必須改用專門的臨界值。本文直接用標準 p 值處理 0/1 的 one-hot 特徵，等於引用了文獻卻沒照它的修正做。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p14">
+    <div>
+      <div class="pno"><span class="id">¶14</span>文獻 · Kanter &amp; Veeramachaneni (2015)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">特徵自動生成部份，我們參考 James et al.(2015) 論文，作者提出 <mark class="k">Deep Feature Synthesis</mark> 方法自動生成特徵，其演算法是透過資料表格之間的關聯性，以及運用各表格的索引連結彼此表格，透過 <mark class="k">transformative primitives</mark> 的轉換後，進而生成特徵。……之後再依據客戶編號，將第二張表格中的商品金額特徵，透過 transformative primitives 的 SUM 的轉換，合併至第三張表格生成新的特徵消費金額。最後再根據業務員編號，將第三張表格的特徵消費金額透過 transformative primitives 的 AVG 轉換，在第四張表格生成出與業務員有關的新特徵平均每單業績。……<mark class="t">透過此一轉換可以生成多個可能有用的新特徵，並增加模型的複雜度，幫助模型從資料中學習樣態。</mark></p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>關鍵概念解說</strong></div>
+      <dl><dt>邏輯角色</dt><dd>DFS 是摘要子論點一的具體工具，用一個四表範例把抽象的演算法講清楚。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">用具體的小例子解釋演算法，對讀者很友善。</span><span class="flaw">只說「可能有用」，沒有討論 DFS 的已知風險：特徵爆炸（後文生成 1242 個）、高度共線性，以及聚合時若跨越時間點，會有「未來資訊」洩漏的問題。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p15">
+    <div>
+      <div class="pno"><span class="id">¶15</span>文獻 · Khan et al. (2017)<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">Cost Sensitive Learning 部份，我們參考 Khan et al.(2017)，相較於原始的 cost sensitive 方法，作者提出新的 <mark class="k">cost sensitive learning matrix</mark> 可以隨著模型的參數一起在訓練過程中更新其樣本權重，動態調整各個樣本點的損失。……作者指出，使用此 cost sensitive learning，不僅可以解決資料不平衡的問題，<mark class="e">其效果甚至會比 SMOTE 等資料樣本生成的方式產生的預測結果佳</mark>，<mark class="c">然而我們從該篇作者所提出的樣本權重更新公式（如附錄三），並未能明確證明出其樣本權重與模型的 F1 Score 之間的關係性</mark>。因此，在我們的研究中，<mark class="m">嘗試會透過樣本權重對 F1 Score 差分方式計算其梯度，並以此更新樣本權重</mark>，並應用至我們的機器學習模型中</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>指出文獻缺口・預告反駁</strong></div>
+      <dl><dt>邏輯角色</dt><dd>文獻回顧中唯一真正的批判性對話，為 ¶46「權重比值才是最適」的結論設好靶子。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">Khan 的方法是為 CNN 影像分類設計的；本文把它搬到 XGBoost 表格資料上，表現不好，未必代表原方法錯了，可能只是不適用。批評的對象和實驗的情境沒有對齊。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 參 資料敘述 ================= -->
+<section class="sec" id="s3">
+  <div class="sec-h"><span class="num">參</span><h2>資料敘述</h2><span class="en">Data</span></div>
+  <p class="sec-sum">三份資料的來源、規模與切分方式。保險資料的時間切分決定了後面所有「法規偏移」的討論。</p>
+
+  <article class="row" id="p16">
+    <div>
+      <div class="pno"><span class="id">¶16</span>資料 · 保險資料規模<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">保險資料是由台灣的保險公司提供，<mark class="e">資料時間是從 2018 年 9 月至 2020 年 9 月</mark>，資料裡包含了保單的各種保險內容、客戶資訊以及業務員資訊……<mark class="e">我們的保險資料數量總共有 1,769,454 筆資料</mark>……故我們必須依據建議書 Dummy 將資料進行整合。<mark class="e">經過建議書 Dummy 合併後，最終會有 506,621 筆保單資料</mark>……另外，<mark class="k">客戶分群、客戶財富等級、客戶忠誠度等級皆是順序變數</mark>。……我們的保險資料是為不平衡資料集，<mark class="e">其中的已成交(未成交)保單有 79,159(427,462) 筆資料</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表三 有效筆數：被保人年齡 263,847｜保額、保費 483,433｜業務員年資 6,333；表四 類別數：保險商品 145、保險種類 11、保險三標 6、業務員 5,086</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供資料證據基礎</strong></div>
+      <dl><dt>邏輯角色</dt><dd>建立主實驗場的規模感：大樣本、正例約 15.6%、多個順序類別變數。這些性質分別對應後面的不平衡處理與編碼實驗。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">表三顯示年齡只有 263,847 筆、保額與保費 483,433 筆有值，缺失比例不低，但全文沒有交代缺失值怎麼處理。業務員資料也只有 6,333 筆紀錄，卻有 5,086 個業務員代號，兩者的對應關係不清楚。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p17">
+    <div>
+      <div class="pno"><span class="id">¶17</span>資料 · 時間切分與法規事件<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">除此之外，為了避免模型窺視到未來的資料，<mark class="m">我們將資料依據時間切分訓練集和測試集，訓練集的時間段是從 2018 年 9 月 10 日至 2020 年 4 月 30 日，測試集為 2020 年 5 月 1 日至 2020 年 9 月 10 日</mark>，而<mark class="k">在 2020 年 7 月金管會提出健全保險商品結構規範</mark>，是屬於此資料集的重大事件，會影響成交預測結果。因此，為了更進一步探討法規變動下帶給模型預測表現的影響，我們進行了兩種實驗來分析，<mark class="m">第一個實驗是捨棄掉 2020 年 7 月法規變動以後的資料，再切其中的 3/4 資料為訓練集、1/4 資料為測試集</mark>（訓練集時間段為 2018 年 9 月 10 日至 2020 年 4 月 30 日，測試集的時間段為 2020 年 1 月 6 日至 2020 年 6 月 30 日）……<mark class="m">故我們統一採用原始的訓練集（即時間段為 2018 年 9 月 10 日至 2020 年 4 月 30 日作為訓練集）來對保單成交預測模型進行訓練，之後再分別對 2020 年 5 月至 2020 年 9 月各個月份分別探討其表現結果</mark>。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>研究設計・埋下伏筆</strong></div>
+      <dl><dt>邏輯角色</dt><dd>時間切分是正確的；但它也決定了測試集「整段都在法規事件之中」，後面 KS 失效的主因在設計階段就已存在。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">依時間切分是金融資料的正確做法，值得肯定。</span><span class="flaw">文中寫實驗(1)的測試期為「2020/1/6 至 6/30」，與訓練期 2018/9/10 至 2020/4/30 重疊，切分描述前後矛盾，可能是筆誤，但會影響讀者判斷有沒有資料洩漏。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p18">
+    <div>
+      <div class="pno"><span class="id">¶18</span>資料 · 金融帳戶與配對交易<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">金融帳戶資料則是以辛宥言(2021) 的資料集為主，其資料為帳戶的交易資料，<mark class="e">時間是從 2018 年 4 月至 2018 年 9 月</mark>。帳戶資料為台灣的銀行資料，而警示帳戶資訊則是從內政部警政署資料中取得。……<mark class="e">配對交易的資料集是 FTSE 和 TWSE 台灣 50 指數的高頻資料，其資料的時間是從 2013 年 1 月至 2016 年 11 月</mark>。……其中有根據郭瑋倫(2021) 所使用到的<mark class="k">價差過程</mark>：P<sub>i</sub>(t) = β<sub>1i</sub> × ln(S<sub>1i</sub>(t)) + β<sub>2i</sub> × ln(S<sub>2i</sub>(t))……其他特徵我們亦考慮 S<sub>i</sub>(t) <mark class="k">股票價格過程</mark>以及 R<sub>i</sub>(t) <mark class="k">報酬過程</mark>。再建構模型建構配對交易的投資策略，以及利用 Kolmogorov-Smirnov test 解釋其模型的效果。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>補充佐證資料</strong></div>
+      <dl><dt>邏輯角色</dt><dd>兩個輔助案例，用來支撐「KS 方法可跨領域適用」的外部效度主張。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">金融帳戶資料只有 6 個月，正例極少（後文的測試集只有十幾到幾十個警示帳戶），F1 對單一樣本的判斷非常敏感。報酬過程公式的分母寫成 S<sub>i</sub>(t)，與第 16 頁寫的 S<sub>i,t−1</sub> 不一致。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 肆 研究方法 ================= -->
+<section class="sec" id="s4">
+  <div class="sec-h"><span class="num">肆</span><h2>研究方法</h2><span class="en">Methodology</span></div>
+  <p class="sec-sum">以保險資料為主軸，列出六個研究方向，並用「偏差-變異拆解 → Learning Curve 診斷」把 DFS 與 KS 分別對應到 underfitting 與 overfitting。</p>
+
+  <article class="row" id="p19">
+    <div>
+      <div class="pno"><span class="id">¶19</span>方法 · 前處理與不平衡處理<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在初步的實驗中，我們會直接將數值資料（如保險人年齡、保額、保費）作為特徵，亦將類別變數……進行 One hot encoding 轉換後作為特徵……<mark class="m">若該保單的客戶為新客戶時，我們在客戶分群、客戶忠誠度及客戶財富指標的 One hot Encoding 特徵會皆設為零，其後額外在保單資料中新增一個 One hot Encoding 的特徵作為表示該保單客戶是否為新客戶</mark>。其二為不平衡資料集問題，資料集中未成交保單的數量遠超過已成交保單的數量，<mark class="c">基於機器學習演算法是要將損失函數最小化，則模型容易訓練成將所有資料皆預測為未成交保單</mark>……<mark class="t">與此同時，由於 Over-sampling 的想法為提高已成交保單在損失函數中的權重，因此我們亦實驗另一種方法處理資料不平衡問題，即透過 cost sensitive learning 調整損失函數權重，將未成交保單的權重設為 1，已成交保單的權重設為 未成交保單數量／已成交保單數量</mark>，以此解決不平衡資料即問題。……我們會運用這些已做好前處理的特徵資料來訓練 Xgboost、Random Forest 和 Logistic Regression</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論說明</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把摘要第四段的概念轉換落實成具體公式，成為 ¶30 表六實驗的依據。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">用「新客戶指標」處理結構性缺失，而不是硬補值，作法合理。</span><span class="flaw">「是否為新客戶」後來是最重要的特徵之一，但新客戶在測試期的比例可能受法規事件影響，本身就是偏移來源。這點文中沒有連結起來。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p20">
+    <div>
+      <div class="pno"><span class="id">¶20</span>方法 · 六個研究方向<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">在初步實驗後，我們採用 F1 Score 表現較佳的 Xgboost 作為之後特徵工程研究的主要模型。更進一步的特徵工程議題，我們的探討方向為：<br><mark class="m">1. 相較於過往的保單相關研究，我們嘗試納入有效的新特徵至模型中訓練。</mark><br><mark class="m">2. ……嘗試運用不同的 Encoding 方法來找出較佳的特徵表示方法。除此之外再運用 AutoEncoder 對特徵進行特徵萃取</mark>……<br><mark class="m">3. ……故透過 Kolmogorov-Smirnov test 進行特徵選擇和 Discriminative Learning 作為資料集偏移的檢測，並找出造成資料集偏移的問題是基於金管會的法規變動的因故導致</mark>……<br><mark class="m">4. 由 Learning Curve 對模型診斷，對訓練狀況和模型表現進行檢查。</mark><br><mark class="m">5. 嘗試特徵自動生成模型 Deep Feature Synthesis 增加特徵的表示方法，改進模型的表現能力。</mark>……<br><mark class="m">6. 我們再參考 Khan et al.(2017) 的論文，藉由修改各個樣本的權重執行 cost sensitive learning</mark></p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>章節路線圖</strong></div>
+      <dl><dt>邏輯角色</dt><dd>整個「實驗結果—保險」就是照這六點的順序展開，可以當作閱讀第伍章的目錄。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">第(3)點在方法章就寫出「找出偏移是因為金管會法規」，等於先寫好答案。這反映實際研究是「先看到結果、再回頭寫方法」的迭代過程，讀起來像預設結論。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p21">
+    <div>
+      <div class="pno"><span class="id">¶21</span>方法 · 業務員特徵與「年資外經驗」<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">對於上述第一部分，<mark class="t">我們考慮業務員與客戶間的對談過程可能會直接影響保單的成交，因此我們認為業務員資訊對於預測保單成交可能會有所幫助</mark>……此外，考慮業務員年齡可能隱含了對預測保單成交有用的資訊，但同時業務員年齡與年資可能具有共線性問題，<mark class="k">故我們建構出”業務員年資外經驗”，此一新特徵以避免共線性問題</mark>。……<br><mark class="m">業務員年齡 = 業務員年資 + 20 + ϵ</mark><br>其中，我們的資料集的時間段（2018 年 9 月至 2020 年 9 月）中的法規規定業務員最低年齡為 20 歲。從上式我們可以推算出在年資外的工作經驗為：<br><mark class="m">業務員年資外經驗 = ϵ = 業務員年齡 − 業務員年資 − 20</mark></p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>概念創造・新特徵</strong></div>
+      <dl><dt>邏輯角色</dt><dd>本文對「保單預測」文獻的第一個實質貢獻：業務員維度的特徵。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">用領域知識（法定最低年齡）把共線變數重新參數化，概念上很巧妙。</span><span class="flaw">表二寫的是「−18」，這裡寫「−20」，前後矛盾。而且 ε 只是年齡的線性轉換，對樹模型來說幾乎不改變資訊量，「避免共線性」的動機對 XGBoost 並不成立。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p22">
+    <div>
+      <div class="pno"><span class="id">¶22</span>方法 · 順序型客戶資訊的編碼<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">……因此我們對於客戶資訊特徵的分析使用有兩種做法：<mark class="m">（1）單獨納入在 One hot encoding 後的客戶分群特徵；（2）同時使用 One hot encoding 後的客戶忠誠度以及客戶財富等級特徵</mark>……透過觀察發現到<mark class="e">客戶分群與成交率之間的線性趨勢呈現統計不顯著，而客戶忠誠度與成交機率的線性趨勢則呈現統計正顯著、客戶財富等級跟成交機率的線性趨勢呈現統計負顯著</mark>。藉由上述的發現，我們接著考慮使用 <mark class="k">Label Encoding</mark>……<mark class="c">然而我們亦考慮客戶資訊與成交率可能並非完全的線性關係</mark>……我們再嘗試 <mark class="k">Target Encoding</mark>（將類別特徵的各個類別計算 P(y = 1|c)，其中的 c 表示該樣本的實際類別－ground truth，y 表示對於該樣本的預測類別，並以此數值作為編碼）……然而由於保險商品的資訊非常的多樣化，因此使用 One hot encoding 編碼必然會產生會高維度且稀疏的特徵，故我們在其中運用 <mark class="k">AutoEncoder</mark> 模型對這群特徵進行降維</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論・特徵表示實驗</strong></div>
+      <dl><dt>邏輯角色</dt><dd>呼應摘要「找到恰當的表示方式」：人工嘗試各種表示 → 效果有限（¶33）→ 引出自動生成的必要性。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">從 EDA 的觀察推導出編碼選擇，論證鏈很清楚。</span><span class="flaw">Target Encoding 若用全部訓練資料計算、沒有做交叉擬合，會把標籤資訊洩漏給模型，訓練 F1 偏高（表十二訓練集 0.516 最高，與此一致）。文中對 P(y=1|c) 中 y 的定義也寫成「預測類別」，有誤。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p23">
+    <div>
+      <div class="pno"><span class="id">¶23</span>方法 · KS 特徵選擇的設計<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">對於第三部分，我們指出若訓練集特徵與測試集特徵的分佈相差甚大，則會降低模型的泛化能力……其中，<mark class="e">我們發現到在數值特徵（如保險人年齡、保額、保費）的分佈上是具有顯著差異</mark>，剛好符合我們對這組資料是否存在資料集偏移問題的疑慮。……<mark class="m">另外又為了避免模型的訓練會使用到測試集的資訊，故在訓練集中我們再切分 3/4 的資料和 1/4 的資料分別作為訓練集和驗證集，再套用 Kolmogorov-Smirnov test 於訓練集和驗證集中做特徵選擇，剔除具有顯著分布差異的特徵</mark>，並希望藉由訓練集和驗證集的特徵選擇來找出訓練集和測試集中有顯著分布差異的特徵。……在透過 Kolmogorov-Smirnov test 做完特徵選擇後，我們以 Xgboost 模型訓練 Discriminative Learning 模型來檢測這筆資料中的資料集偏移問題是否得到改善。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>核心方法的操作化</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把摘要的主命題落地成可執行的流程，關鍵假設是「訓練期內部的偏移可以代理未來的偏移」。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">刻意不碰測試集，方法學上的自律值得肯定。</span><span class="flaw">切分比例這裡寫 3/4：1/4，到 ¶36 實作時卻變成 7:3，前後不一致。更根本的是，「Train 2 和 Validation 的偏移 ≈ 訓練和測試的偏移」這個代理假設，只有在偏移是緩慢漂移時才成立；遇到法規這類突發的結構性斷點，代理必然失效。而這正是後面的結果。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p24">
+    <div>
+      <div class="pno"><span class="id">¶24</span>方法 · 偏移仍在 → 避開法規期<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="c">經過 Discriminative Learning 進行資料集偏移問題檢查後，我們發現特徵選擇完後資料集仍然存在資料集偏移的問題</mark>……<mark class="c">而 Kolmogorov-Smirnov test 在訓練集和驗證集中的特徵選擇並未排除掉訓練集和測試集分布差異顯著的特徵</mark>。……<mark class="k">我們找出在 2020 年 7 月金管會提出健全保險商品結構規範，將壓縮儲蓄險利率空間，進而導致很多的儲蓄險保單即將停賣</mark>，也因此會使測試集的特徵出現重大變動。基於上述的想法，<mark class="m">我們接著透過直接避開 2020 年 7 月的法規變動日期</mark>，亦或是考慮到市場機制中，當法規變動的消息出現於市場時，則市場被保人和要保人對保單的購買便會開始改變……<mark class="m">我們嘗試避開 2020 年 6 月，再套用 Kolmogorov-Smirnov test 做特徵選擇</mark></p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>讓步＋修正策略</strong></div>
+      <dl><dt>邏輯角色</dt><dd>承認方法的失效，並提出「排除事件期」的補救，把失敗轉化成論點的適用邊界。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「避開事件期」在學術上合理，在實務上卻不可行：部署時沒辦法預先刪掉未來的法規衝擊。這個修正讓 KS 在「平穩期」有效，卻也間接承認它對真正需要它的「結構斷點」無能為力。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p25">
+    <div>
+      <div class="pno"><span class="id">¶25</span>方法 · 偏差-變異拆解<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">而模型診斷（Model Diagnose）方法我們先參考 <mark class="k">Domingos (2000)</mark> 所提出的觀點。……對於任意一個模型的誤差值皆可以表示成：<mark class="m">Error = c1 × Noise + c2 × Variances + Bias</mark><br><mark class="c">然而對於 c1 和 c2 的探討，我們認為其係數的結果並非文中所指的</mark>……<mark class="c">然而我們指出若 t = y 時，必然 y∗ = y，因此此解不成立</mark>。其中 Bias 部分是源自於我們運用所擁有的資料建構出來的模型與假設中能夠建立的最佳模型之間的誤差，而 Variances 為我們的模型對於資料預測的變異程度。綜上二者，<mark class="k">我們可以從模型的預測誤差中，可以拆解模型的 underfitting 和 overfitting 分別為 Bias 和 Variance 此二項</mark>。</p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>理論框架・挑戰權威</strong></div>
+      <dl><dt>邏輯角色</dt><dd>替後面的 Learning Curve 診斷提供理論語言，讓「DFS 治 bias、KS 治 variance」的分工有所依據。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">質疑一篇高引用 AAAI 論文的推導是很大膽的主張，但只用一句話帶過，沒有完整推導或反例；而且這個質疑對本文後續的實驗毫無影響，等於是一段懸空的論證。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p26">
+    <div>
+      <div class="pno"><span class="id">¶26</span>方法 · Learning Curve 診斷 → 對症下藥<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">對模型的 Bias 和 Variance 觀察，我們可以參考 Bickel et al.(2021) 和 Giola (2021) 所提出的 Learning Curve，<mark class="m">將訓練集資料依比例從 0% 至 100% 等分成多個不同數量的資料集，依照時間排序進行切分資料</mark>……在 Learning Curve 中，如果訓練集和測試集的 Learning Curve 間隔差距隨著資料量比例增加而變大，則表示這個模型出現了 High variance 問題……<mark class="e">我們發現到在目前的資料和模型建構下會同時存在著 underfitting 和 overfitting 的問題</mark>。……<mark class="t">由上述的分析，故在第五部分我們為了解決 underfitting，也就是需要再進行更完善的特徵表示方法，因此我們更進一步地提出運用 automatic feature generation 方法來增加特徵表現。同時解決 overfitting，即讓模型不要落入區域最佳解，我們運用 Kolmogorov-Smirnov test 方法進行特徵選擇</mark>。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>論證樞紐：問題 → 工具的配對</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文最關鍵的橋接段：把兩個方法工具分別對應到兩個可診斷的病因，讓「先 DFS、後 KS」的順序有了理由。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">「診斷 → 處方」的敘事結構，讓整串實驗看起來有系統，而不是隨機嘗試。</span><span class="flaw">但概念上有混淆：資料集偏移造成的訓練/測試差距並不是過擬合，也和「局部最佳解」無關。把 KS 說成治療過擬合，是把兩種不同的泛化失敗混為一談。另外，Learning Curve 引用了「Bickel et al.(2021)」，但 Bickel 的文獻是 2007 年討論判別式學習，並非 Learning Curve，引用有誤。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p27">
+    <div>
+      <div class="pno"><span class="id">¶27</span>方法 · DFS 在保險資料上的設定<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">而在我們的保險資料中，經過觀察後大致上可以分成<mark class="m">(1)客戶資訊表格</mark>……<mark class="m">(2)業務員資訊表格</mark>……<mark class="m">(3)保單資訊表格</mark>……以此三個表格套用 Deep Feature Synthesis 演算法，<mark class="m">並且設定 transformative primitives 為 SUM、MEAN 和 LAST（從資料中找出最新的資訊）</mark>。最終我們在 Deep Feature Synthesis 生成特徵後，比較加入這些新的特徵，是否能夠改善模型的表現……<mark class="c">我們考慮 Deep Feature Synthesis 的生成特徵維度可能偏高，因此希望再透過 AutoEncoder 方式進行降維</mark></p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論說明</strong></div>
+      <dl><dt>邏輯角色</dt><dd>子論點一的具體實驗設計，對應 ¶41–¶45 的結果。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">LAST（取最新一筆）在依客戶聚合時，若沒有限定「預測時點以前」，會把同一客戶未來保單的資訊帶進來，形成時間洩漏。文中沒有說明 DFS 的 cutoff time 設定，而這正是 DFS 最常見的陷阱。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p28">
+    <div>
+      <div class="pno"><span class="id">¶28</span>方法 · 修改 Khan 的權重梯度<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">原始 Khan et al.(2017) 的論文中，該作者是依據 組內變異／組間變異 比值和混淆矩陣進行計算，計算出樣本權重的矩陣以及其梯度……故而使用 L2 範數對樣本權重矩陣進行梯度下降的更新……<mark class="c">然而 Khan et al.(2017) 文獻中未說明與證明其所設計的最終收斂的樣本權重矩陣</mark>，<mark class="m">故我們再透過 F1 Score 對樣本權重的差分計算梯度，觀察使 F1 Score 最大化下，樣本權重更新造成模型表現的差異</mark>，並從中驗證 Khan et al.(2017) 最終收斂的樣本權重矩陣的有效性。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法論・替代方案</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把 ¶15 的批評轉成可以檢驗的實驗設計。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">直接以評估指標（F1）為目標做差分優化，邏輯直觀。</span><span class="flaw">F1 是不可微、階梯狀的函數，差分梯度在大部分區域接近 0，很容易「停在起點」。這正好可以解釋後面權重幾乎不動的結果（¶46）。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p29">
+    <div>
+      <div class="pno"><span class="id">¶29</span>方法 · 洗錢與配對交易的方法<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">另一方面，<mark class="e">針對過往文獻的特徵透過 Kolmogorov-Smirnov Test 做特徵選擇，發現到 KNN 和 LOF 特徵在訓練集和測試集的分佈有顯著差異，並且將 KNN 和 LOF 特徵捨棄掉後，模型的表現亦能有顯著的改進</mark>，故我們會繼續延伸此一論述。<mark class="m">我們接著比較 Kolmogorov-Smirnov Test 特徵選擇與其他不同的特徵選擇方法</mark>……在此資料集中，<mark class="m">我們分別使用股票價格過程、價差過程……和報酬過程……建構三種不同的卷積神經網路模型</mark>，預測最適平倉建倉策略，並比較了此三種模型的預測結果。<mark class="e">在我們的實驗中發現到利用價差過程建模的預測效果最佳，另外我們也找出價格過程、報酬過程有訓練集和測試集分佈不同的問題，而價差過程則在訓練集和測試集的分佈較為一致</mark>。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>輔助案例的方法藍圖</strong></div>
+      <dl><dt>邏輯角色</dt><dd>交代兩個佐證案例如何對應主命題：洗錢案例檢驗「KS 優於其他篩選法」，配對交易檢驗「分佈穩定 ↔ 報酬」。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">方法章就先寫出「價差模型最好」的結果，方法與結果的界線模糊。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 伍-1 保險實驗 ================= -->
+<section class="sec" id="s5a">
+  <div class="sec-h"><span class="num">伍-1</span><h2>實驗結果：保險資料</h2><span class="en">Results — Insurance</span></div>
+  <p class="sec-sum">全文篇幅最大的部分。論證節奏是：基準 → 人工特徵（小幅改善）→ 發現偏移 → KS 失效 → 追溯法規 → DFS 補資訊 → 避開法規後 KS 生效。</p>
+
+  <article class="row" id="p30">
+    <div>
+      <div class="pno"><span class="id">¶30</span>結果 · 表六 不平衡處理<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">由表六可知當我們的資料尚未做 Over-sampling 時，由於每一個樣本點對於模型的損失函數皆是相同的權重……所以模型在進行損失函數最小的最佳化過程中，容易訓練成忽略掉已成交資料的資訊，並將大部分的資料皆預測為未成交的狀況。因此 Over-sampling 前的 F1 Score 才會偏低。……<mark class="t">同時，Over-sampling 可以視為增加已成交保單在損失函數中的權重</mark>。因此，若我們調整所有保單資料的樣本權重採 weighted cross entropy，將未成交保單的權重設為 1，<mark class="e">已成交保單的權重設為 427,461／79,159 ≈ 5.4</mark>，亦防止不平衡資料集的問題，達到相同的效果。<mark class="c">其中 weighted cross entropy 相較於 Over-sampling 較無隨機因素</mark>……因此其 F1 Score 會較穩定。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表六 測試 F1：未處理 0.2088｜Over-sampling 0.3688｜Weighted cross entropy 0.3850（訓練 F1：0.3069｜0.3995｜0.4717）</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供證據・驗證概念轉換</strong></div>
+      <dl><dt>邏輯角色</dt><dd>實證支持摘要第四段「重抽樣＝調權重」的說法，也確立後續實驗的基準設定。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">0.209 → 0.369／0.385 的落差清楚而有說服力。</span><span class="flaw">「較穩定」是理論推論，沒有做多次隨機種子實驗來實證。另外，加權交叉熵明明比較好，後續實驗卻多半沿用過採樣作為基準，選擇理由沒有交代。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p31">
+    <div>
+      <div class="pno"><span class="id">¶31</span>結果 · 表七 模型選擇與 epoch 選擇<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">接著我們以此上述的特徵與對訓練集的 Over-sampling 方法，進行模型選擇，<mark class="e">並且可以發現到 Xgboost 模型的預測效果較佳</mark>。其中，Logistic 迴歸可以視作一個找出一條線性的 Discriminative Boundary……<mark class="c">然而隨機森林的缺點正是其在預測各樣本為 positive 或 negative 時，各特徵之間的影響力是獨立的</mark>……然而由於 Xgboost 在訓練時可以持續訓練使模型在訓練集的預測 F1 Score 接近於 1，但測試集的預測 F1 Score 卻會在出現訓練到某一個 Epoch 後，開始下降。<mark class="m">因此在之後的實驗我們皆是以測試集 F1 Score 最高下的訓練狀況進行討論</mark>（意即訓練集的預測 F1 Score 會以在測試集的最高預測 F1 Score 之 Epcoh 下的表現來顯示）</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表七 測試 F1：Xgboost 0.3688｜隨機森林 0.3324｜Logistic 迴歸 0.2910</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供證據・設定評估規則</strong></div>
+      <dl><dt>邏輯角色</dt><dd>確立 XGBoost 為主模型，也悄悄設下一條影響全章的評估規則。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">⚠ 全文最嚴重的方法問題：<b>用測試集挑最佳 epoch，等於拿測試集調參</b>，之後所有測試 F1 都偏樂觀，也讓不同方法之間的比較失去公平基礎。此外，「隨機森林各特徵獨立」的說法不正確：決策樹的分裂路徑本身就會捕捉特徵交互作用。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p32">
+    <div>
+      <div class="pno"><span class="id">¶32</span>結果 · 表九 業務員特徵<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">相較於 Wang (2020) 的特徵研究，我們多考慮了業務員特徵納入模型訓練。我們指出業務員是影響顧客購買保單的重要因素之一……因此我們最終納入了業務員年齡、業務員年資和業務員年資外經驗作為模型訓練的特徵。<mark class="e">從模型的訓練結果可以看出，其表現的 F1 Score 著實有顯著的改善</mark>。……<mark class="t">綜上所述，業務員的資訊對於保單預測是有顯著的幫助，也顯示出了特徵對於模型預測的重要性</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表九 F1（納入前→後）：訓練 0.4040→0.5018｜測試 0.3684→0.3858</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供證據・子貢獻</strong></div>
+      <dl><dt>邏輯角色</dt><dd>本文對保險文獻的第一個實證貢獻，結論章也會再引用。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">訓練 F1 提升 0.098，測試只提升 0.018。提升主要發生在訓練端，比較像增加了過擬合的空間，而非真正的泛化收益。「顯著」一詞沒有任何統計檢定或重複實驗支持。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p33">
+    <div>
+      <div class="pno"><span class="id">¶33</span>結果 · 表十～十二 客戶資訊的順序性<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">我們可以發現，客戶分群的斜率 P 值大於 0.5，表示該順序性與成交率的關係並不顯著，然而客戶忠誠度等級和財富指標則是其順序性和成交率有顯著的關係</mark>。……從表十一可以看出，同時採客戶忠誠度等級和財富指標的模型在測試集的表現會比僅使用客戶分群的模型好一點。<mark class="c">然而其中的改善並不顯著</mark>……從表十二中在測試集的 F1 Score 可以看出，Target encoding 表現較好，One hot encoding 次之，而 Label encoding 表現最差。……<mark class="c">但同樣地，模型表現的差異皆有不顯著的問題</mark>。綜上所述，我們改採 AutoEncoder 方法進行特徵工程。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表十 斜率（p 值）：客戶分群 −0.0092（0.552）｜忠誠度 −0.0184（0.038）｜財富 0.0089（0.07）；表十一 測試 F1：忠誠＋財富 0.3858｜分群 0.3847；表十二：Target 0.3874｜One-hot 0.3858｜Label 0.3818</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>誠實的讓步（負面結果）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>呈現「人工細修表示法效果有限」，間接支撐摘要的前提：人工難以窮盡，需要自動生成。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">如實承認差異不顯著，學術上誠實。</span><span class="flaw">財富的 p = 0.07 在常見的 5% 水準下並不顯著，作者卻寫成「有顯著關係」。這條迴歸只有 5～7 個點（等級數），統計檢定力本來就很低。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p34">
+    <div>
+      <div class="pno"><span class="id">¶34</span>結果 · 表十四 AutoEncoder 降維<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">其中的 AutoEncoder 模型架構如表十三所示，<mark class="m">Encoder 主要是透過四個全連結層，將特徵資料壓縮至隱藏層中，Decoder 則是再透過同樣四層全連接層，對隱藏層的資訊進行重構</mark>……<mark class="c">由表十四可以看出，運用 AutoEncoder 轉換雖然能夠進行降維，然而在保單預測的表現上卻未能提升模型預測的表現能力</mark>。為求提升模型的表現，我們再繼續由資料集偏移方向探討該特徵工程議題</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表十四 測試 F1：原始特徵 0.3812｜AE 8 維 0.3107｜10 維 0.3110｜12 維 0.3132</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>負面結果・轉向</strong></div>
+      <dl><dt>邏輯角色</dt><dd>又一條路走不通，藉此把敘事轉向本文主軸：資料集偏移。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">基準 F1 這裡是 0.381，前一段卻是 0.386，不同實驗用的基準不一致，讀者很難串起來比較。AutoEncoder 用 unsupervised 重建目標壓縮 145 個商品類別，丟掉「哪些商品跟成交有關」的資訊，結果變差在預料之中。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p35">
+    <div>
+      <div class="pno"><span class="id">¶35</span>結果 · 表十五～十七 KS 檢定 p 值<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">表十五和表十六為運用 Kolmogorov-Smirnov test 檢驗訓練集和測試集特徵分佈的差異……<mark class="e">從上我們可以看出除了財富指標為 R5 下的被保人年齡 P 值大於 0.01，而其他的特徵 P 值皆很小</mark>，<mark class="t">因此我們可以推論出不論是新客戶或舊客戶……在訓練集和測試集的特徵分佈差異幾乎皆顯著，因此資料內可能出現資料集偏移的問題</mark>。……<mark class="e">我們可以發現到在各種不同的客戶忠誠度等級和財富指標組合下之 P 值皆較小</mark></p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表十五、十六：幾乎所有群組的年齡／保額／保費 p≈0.000；表十七（忠誠 × 財富組合）中也有不少 p 值偏大，例如 R1C&amp;L4 年齡 0.792、R5&amp;L2 保額 0.530、R4&amp;L1 保費 0.378</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供證據・確認問題存在</strong></div>
+      <dl><dt>邏輯角色</dt><dd>「問題存在」的第一層證據（統計檢定），下一段再用判別式學習做第二層確認。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">按客戶群分層檢定，排除「只是客群組成不同」的解釋，設計細緻。</span><span class="flaw">樣本動輒數萬筆時，KS 幾乎對任何微小差異都會拒絕虛無假設，p≈0 只代表「不完全相同」，不代表「差異大到會傷害模型」。應該報告 D 統計量（效果量），而不是只看 p 值。另外，作者說各種組合「P 值皆較小」，但表十七其實有不少 p 值偏大的格子（例如 R1C&amp;L4 年齡 0.792），屬於以偏概全。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p36">
+    <div>
+      <div class="pno"><span class="id">¶36</span>結果 · 表十八 判別式學習＋對照組<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">從圖六和表十八可以看出，<mark class="e">在未做 Kolmogorov-Smirnov test 特徵選擇時……在 Discriminative Leaning 的測試集的 F1 Score 較高</mark>，也就是驗證了原先資料集確實有資料集偏移的狀況。而經過 Kolmogorov-Smirnov test 在訓練集和驗證集的特徵選擇後（即篩選掉 P 值為 0.0 的特徵，共篩選掉 6 個特徵），Discriminative Learning 模型的 F1 Score 開始下降。<mark class="m">同時我們也做對照組實驗，採用 Kolmogorov-Smirnov test 篩選掉其 P 值為 1.0 的特徵（意即訓練集和測試集分佈相同的特徵，共篩選掉 65 個特徵）</mark>，其 Discriminative Learning 的 F1 Score 與未做特徵篩選時的 F1 Score 幾乎相同，<mark class="t">證實了 Discriminative Learning F1 Score 的下降並非是由於特徵選擇使特徵數量下降所導致，而是由 Kolmogorov-Smirnov Test 篩選掉 P 值為 0.0 的特徵，減緩資料集偏移問題所致</mark>。<mark class="c">然而做完特徵選擇後的 F1 Score 仍未能大幅下降</mark></p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表十八 判別測試 F1：未篩選 0.6920｜剔除 p=0（6 個特徵）0.6476｜剔除 p=1（65 個特徵）0.6903</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>關鍵證據・對照組設計</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文最乾淨的因果證據之一：用「隨機刪特徵」以外的對照組，排除「特徵數減少」的替代解釋。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">★ 對照組設計是本段的亮點，直接回應了「是不是只因為特徵變少？」這個最自然的質疑。</span><span class="flaw">但效果量很小（0.692 → 0.648），判別器依然能清楚區分兩期資料。而且對照組只刪「p=1」的特徵，比較理想的對照是「隨機刪 6 個特徵」，讓刪除數量也一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p37">
+    <div>
+      <div class="pno"><span class="id">¶37</span>結果 · 表十九 KS 反而讓預測變差<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">另外再由於經過訓練集（Train 2）和驗證集（Validation）的 Kolmogorov-Smirnov test 的特徵選擇後，因為未能完整且正確地捨棄掉訓練集（Train 1）和測試集分佈不同（Test）的特徵，所以才會發生 Kolmogorov-Smirnov test 特徵選擇後，保單預測結果表現變差的結果……<mark class="c">在表十九中，我們在做完 Kolmogorov-Smirnov test 的特徵選擇後，不論是在驗證集抑或是測試集的表現上，皆未能提升其模型預測的表現，此一結果與我們的預期不符合</mark>。因此，<mark class="c">我們推測原因可能是由於目前模型有欠擬合（underfitting）問題，使模型仍然需要其他特徵來訓練，此時若使用特徵選擇來篩選特徵以降低模型的複雜度，將會導致模型的預測表現下降</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表十九 F1（篩選前→後）：Train 2 0.4738→0.4515｜Validation 0.3987→0.3809｜Test 0.3777→0.3443</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>面對反例・提出兩個解釋</strong></div>
+      <dl><dt>邏輯角色</dt><dd>主命題在主實驗場的第一次失敗。作者用「法規」與「欠擬合」兩個解釋保住論點，並由後者引出 DFS。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">誠實報告與預期相反的結果。</span><span class="flaw">兩個解釋都是事後提出，而且彼此有張力：若問題是法規造成的偏移，與欠擬合無關；若是欠擬合，法規解釋就不必要。當一個理論可以用任一解釋吸收所有反例時，它的可否證性就降低了。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p38">
+    <div>
+      <div class="pno"><span class="id">¶38</span>結果 · 圖七、圖八 儲蓄險的 EDA<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">由圖七我們可以看出儲蓄險保險在 2020 年 5 月時有出現儲蓄險購買量的高峰，並交易量創了新高，而正好 5 月時也已有新聞稿發布促使人們盡快購買儲蓄險，跟此一時間段的購買量高峰吻合。而在 2020 年 7 月時法規實施後，儲蓄險的購買數量著實下滑且數量跌破新低</mark>……<mark class="c">因此為了剔除掉此一疑慮，我們剔除掉保單數量的問題，改成以 儲蓄險數量／保單數量 的比例方式進行觀察</mark>……<mark class="e">從圖八我們同樣可以看出 2020 年 5 月時著實是儲蓄險購買比例的高峰時刻，並且在 2020 年 7 月時儲蓄險購買的比例呈現低谷</mark>。<mark class="t">驗證了金管會提出的健全保險商品結構規範所造成的資料分佈影響</mark>。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>提供證據・支撐法規解釋</strong></div>
+      <dl><dt>邏輯角色</dt><dd>替 ¶37 的事後解釋補上獨立的描述性證據，讓「法規造成偏移」從猜測變成有資料支撐的推論。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">主動做比例標準化排除替代解釋，是很好的論證習慣。</span><span class="flaw">但「儲蓄險比例改變」不等於「模型用到的特徵分佈改變」。要把兩者連起來，應該直接比較法規前後特徵的 KS 統計量。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p39">
+    <div>
+      <div class="pno"><span class="id">¶39</span>結果 · 圖九、表二十 逐月表現<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="c">然而由圖九我們可以看出 2020 年 6 月著實有比 2020 年 7 月至 9 月的表現還好，然而 2020 年 5 月卻比 2020 年 7 月至 8 月差</mark>，我們可以猜測其結果可能是因為：(1) 由圖七和圖八可以看出 2020 年 5 月新聞稿發佈導致儲蓄險的購買量爆增；(2) 同樣由圖七和圖八可以看出有季節性的特徵現象發生……<mark class="m">因此，我們考慮使用每個月的儲蓄險保單數量變化量或保單建立的月份資訊作為特徵，來嘗試捕捉週期性現象</mark>……<mark class="e">從表二十，我們可以發現到，不論加入儲蓄險保單差額或是保單建立的月份資訊月份資訊，模型表現的結果皆會變差</mark>。<mark class="t">因此我們可以猜測圖九中的 2020 年 5 月保單預測 F1 Score 下降的原因應該是由於 2020 年 5 月發佈的金管會施健全保險商品結構規範新聞稿，導致市場異常購買的結果</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十 測試 F1：原始特徵 0.3812｜＋儲蓄險月變化量 0.3711｜＋保單建立月份 0.3622</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>處理反常結果・排除法論證</strong></div>
+      <dl><dt>邏輯角色</dt><dd>處理「5 月比法規實施後還差」這個不符預期的現象，最後收斂回法規解釋。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">排除法用得太快：加了季節特徵效果變差，不代表季節性不存在。可能是特徵設計不當，也可能是訓練期只有約一年半，模型根本學不到年週期。由「此路不通」推出「必是彼因」，是假二分的推論。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p40">
+    <div>
+      <div class="pno"><span class="id">¶40</span>結果 · 圖十 Learning Curve<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">如圖十，我們由 1% 至 100% 逐步增加訓練資料的比例大小，而固定測試集資料量的大小下……<mark class="e">我們從中可以看出隨著訓練資料集越大，訓練集的 Learning curve 和測試集的 Learning curve 差距則越大</mark>，也就表示了逐漸找到訓練集的區域最佳解，但對於測試集未能有很好的一般化表現，也就顯示了模型有 overfitting 問題。……<mark class="e">（其 F1 Score 仍低於 0.4，顯示模型的預測能力不足）</mark>……<mark class="t">進而使我們在做特徵選擇捨棄部分特徵時，模型能使用的資訊更少，故會導致預測的 F1 Score 降低。綜上所述，為了解決此問題，我們參照 Kanter et al.(2015) 所提出的 Deep Feature Synthesis 方法，利用特徵生成增加特徵表示方法，以解決特徵擬合不足的現象</mark>。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>診斷證據・轉入 DFS</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把 ¶37 的「欠擬合」猜測變成有圖支撐的診斷，正式啟動子論點一（DFS）的實驗。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">典型的高變異情況是差距大，但隨資料量增加而<b>縮小</b>。本文的子集是依時間順序切的，資料越多就越靠近過去，與測試期的時間距離結構也跟著改變；差距<b>擴大</b>更可能是偏移的訊號，而不是過擬合。這張圖其實比較支持「偏移」，作者卻讀成「過擬合＋欠擬合」。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p41">
+    <div>
+      <div class="pno"><span class="id">¶41</span>結果 · 表二十一 DFS 的效果<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">合併中我們使用 transformative primitives（如 SUM、MEAN 和 LAST）進行函數轉換做特徵生成。……<mark class="e">（最終共生成 1242 個特徵）</mark>。……<mark class="e">由表二十一上表格的第二行我們可以看出保單預測模型在不論是訓練集（Train）或測試集（Test）上的 F1 Score 皆有所改進</mark>。<mark class="t">也就表示 Deep Feature Synthesis 著實有捕捉到更多有用的特徵訊息，使模型訓練得更有效</mark>。……<mark class="c">Deep Feature Synthesis 後接著做根據訓練集（Train 2）和驗證集（Validation）的 Kolmogorov-Smirnov test 特徵選擇，其 F1 Score 不論是在測試集（Test）表現不佳</mark>……<mark class="e">我們可以看出在做完 Deep Feature Synthesis 特徵生成後，其資料集偏移偏移較為嚴重</mark></p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十一 測試 F1：原始 0.3812｜DFS 0.4091｜DFS＋KS 0.3410（訓練 F1：0.4693｜0.6715｜0.4273）；判別測試 F1：DFS 1.0｜DFS＋KS 0.9780</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>子論點一的主要證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>DFS 的正面證據（+0.028），同時記錄 KS 在事件期的再次失效。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">判別 F1 = 1.0 代表判別器能完美分辨兩期資料。DFS 生成了「最後異動年份」這類直接編碼時間的特徵（見 ¶44），完美可分幾乎是必然的。這些時間戳特徵進入預測模型後，也可能是訓練 F1 暴漲到 0.671 的原因，有時間洩漏的疑慮。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p42">
+    <div>
+      <div class="pno"><span class="id">¶42</span>結果 · 表二十二 改用訓練集對測試集做 KS<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="t">儘管如此，我們仍然指出 Kolmogorov-Smirnov test 特徵選擇方法著實可以解決資料集偏移的問題</mark>，當我們先運用 Deep Feature Synthesis 處理特徵擬合不足的問題後，<mark class="m">再以 “訓練集（Train 1）和測試集（Test）” 進行 Kolmogorov-Smirnov test 特徵選擇</mark>，與先前的 “訓練集（Train 2）和驗證集（Validation）” 做 Kolmogorov-Smirnov test 特徵選擇進行比較（如表二十二）。我們可以發現到若是針對訓練集（Train 1）和測試集（Test）做 Kolmogorov test 特徵選擇，由於是直接進行特徵分佈差異的檢定，並捨棄掉直接導致 dataset shift 問題發生的特徵，<mark class="e">因此資料的 dataset shift 問題可以獲得改善，從而使其 F1 Score 可以得到改善</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十二 測試 F1：Train 2／Validation 篩選 0.3157｜Train 1／Test 篩選 0.4274；判別測試 F1：0.9780｜0.9244</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>強行維護論點</strong></div>
+      <dl><dt>邏輯角色</dt><dd>在連續兩次失效後，作者用這個實驗「證明 KS 原理上可行」，替主命題解套。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">⚠ 這與 ¶23「避免使用測試集資訊」的原則直接矛盾：用測試集的特徵分佈來篩選特徵，是典型的資料洩漏（雖然沒用到標籤，屬於 transductive 設定）。0.427 這個數字在部署時不可能得到，不能拿來當作方法有效的證據，最多只能說明「如果事先知道未來分佈，KS 會有用」。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p43">
+    <div>
+      <div class="pno"><span class="id">¶43</span>結果 · 表二十三 避開法規期<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">因此我們將資料捕捉在 2020 年 5 月以前。<mark class="m">重新定義訓練集（Train 1）為 2018 年 9 月 10 日至 2019 年 9 月 10 日，測試集（Test）為 2019 年 9 月 11 日至 2020 年 4 月 30 日</mark>……<mark class="e">當我們移除掉 2020 年 5 月有資料集偏移問題的資料後，可以發現到在 Deep Featur Synthesis 生成完特徵後使用 Kolmogorov-Smirnov test 特徵選擇可以使模型表現有顯著的上升</mark>，<mark class="t">這顯示出當我們暨避開 2020 年 5 月法規使特徵變動的問題後，再透過 Kolmogorov-Smirnov Test 篩選掉訓練集和測試集特徵分佈有差異的特徵，即可使模型預測表現改善，這也意味著該法規變動事件著實有導致資料集偏移之顯著影響</mark>。……<mark class="t">其生成的特徵可以幫助模型解決欠擬合（Underfitting）問題，進而使 Kolmogorov-Smirnov Test 特徵選擇方法有效</mark>。同樣地，我們再觀察 Discriminative Learning 的結果（表二十三下表格），<mark class="e">可以發現到 Kolmogorov-Smirnov Test 對於處理資料集偏移問題有更為明顯的改善</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十三 測試 F1：原始 0.3506｜DFS 0.3930｜DFS＋KS 0.4179；判別測試 F1：DFS 1.0｜DFS＋KS（剔除 103 個）0.5353｜剔除 p=1（118 個）1.0</div>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>主命題最強的證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文的「決定性實驗」：在乾淨的時間窗、不碰測試集的設定下，同時呈現預測改善（+0.067）與偏移下降（1.0 → 0.535），把 DFS 與 KS 的協同效應串成完整的閉環。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">★ 預測指標與偏移指標同向變化，兩條證據互相印證。</span><span class="flaw">仍然只有單一切分、單次訓練，沒有變異估計；epoch 依然用測試 F1 挑選（¶31）。結論寫「證實 DFS 讓 KS 有效」，但缺少「原始特徵＋KS」這個對照組，無法區分是 KS 本身有效，還是一定要搭配 DFS 才有效。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p44">
+    <div>
+      <div class="pno"><span class="id">¶44</span>結果 · 表二十四、二十五 特徵重要性<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">我們可以發現到在進行Deep Feature Synthesis 前，重要特徵主要集中為各種商品，然而在 Deep Feature Synthesis 後，特徵重要性則大多改為其自動生成出來的特徵</mark>。<mark class="t">因此足以說明 Deep Feature Synthesis 著實改善模型的表現</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十四（DFS 前，172 個特徵）：SLTC 0.0432、是否為新客戶 0.0235｜表二十五（DFS 後，1242 個特徵）：SLTC 0.0093、新舊客戶 0.0082、客戶最後異動年份 0.0069、保單最後異動年份 0.0059</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>補充證據（解釋性）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>用「重要性換手」佐證 DFS 有貢獻。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">特徵重要性換手不等於表現提升（那是表二十一的工作）。更值得警惕的是：「最後異動年份」這類特徵直接編碼了時間，模型可能是在學「年份 → 成交率」的趨勢，而不是客戶行為；這正是偏移的來源，也呼應 ¶41 判別 F1=1.0 的現象。最高重要性從 0.043 降到 0.009，也顯示重要性被 1,242 個特徵大幅稀釋。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p45">
+    <div>
+      <div class="pno"><span class="id">¶45</span>結果 · 表二十六 DFS + AutoEncoder + PCA<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">另外我們亦考慮 Deep Feature Synthesis 所生成的特徵會有高度相關性……<mark class="m">因此我們再嘗試通過 PCA 方法來使這些 AutoEncoder 所產生的特徵變成互相線性獨立</mark>。……故以 PCA 轉換後的特徵必然互為獨立）……<mark class="c">從表二十六我們可以看出，若在 Deep Feature Synthesis 上使用 AutoEncoder，雖然依舊能夠提升模型的預測表現</mark>……<mark class="c">因此會比表二十一直接使用 Deep Feature Synthesis 所生成之特徵的模型預測表現差</mark>。<mark class="t">從中我們可以推論出保單成交預測的分類問題，會需要在較高維度的狀況下才能夠比較出已成交保單和未成交保單之間特徵的差異</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十六 測試 F1：原始 0.3812｜DFS＋AE 0.3824｜DFS＋AE＋PCA 0.3815（單用 DFS 為 0.4091）</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>負面結果・推出小結論</strong></div>
+      <dl><dt>邏輯角色</dt><dd>排除「壓縮 DFS」這條路，間接強化「DFS 原始高維資訊有價值」。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">文中說 PCA 後的特徵「必然互為獨立」，這不正確：PCA 只保證<b>不相關</b>（uncorrelated），不保證統計獨立。此外，XGBoost 本來就不怕共線性，做 PCA 的動機不足。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p46">
+    <div>
+      <div class="pno"><span class="id">¶46</span>結果 · 表二十七、二十八 成本敏感學習<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">其中顯示了該作者提出的方法能夠改善資料集不平衡問題，但是模型表現效果仍然遠差於 Oversampling 的方法</mark>。……<mark class="e">其測試集的 F1 Score 與原先的 F1 Score 並未有很大的差異</mark>，<mark class="t">這顯示出樣本權重設定成：已成交保單權重為 未成交保單數量／已成交保單數量 = 5.4、未成交保單權重為 1 已是使 F1 Score 最大化的權重設定</mark>……<mark class="e">（同時，差分梯度更新後，樣本權重會收斂到已成交保單權重為 5.4446、未成交保單權重為 0.96178）</mark>。<mark class="t">綜上所述，我們認為樣本權重的設定應該是 positive 樣本權重為 Positive 樣本數量／Negative 樣本數量、Negative 樣本權重為 1，方能使 F1 Score 最大化，而非 Khan et al. (2017)【8】所提出的樣本權重方法</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十七、二十八 測試 F1：Over-sampling 0.3812｜Khan 方法 0.3385｜F1 差分梯度 0.3805｜固定比例權重 0.3789；收斂 epoch：143 對 141</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>反駁文獻・提出替代主張</strong></div>
+      <dl><dt>邏輯角色</dt><dd>完成 ¶15 設下的反駁：Khan 的方法在此表現較差，簡單的比例權重已經接近最適。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">從比例權重出發、權重只移動了一點點，只能說明比例權重是<b>局部</b>穩定點，不能證明它是全域最適（差分梯度在 F1 這種階梯函數上本來就容易停滯，見 ¶28）。0.381 對 0.379 的差距也遠小於隨機波動的合理範圍。另外，Khan 的方法原本是為 CNN 設計的，套在 XGBoost 上失敗，不足以否定原作。⚠ 原文最後歸納的規則寫成「positive 權重 = Positive 樣本數量／Negative 樣本數量」，比例寫反了（照前文應是 Negative／Positive ≈ 5.4），同一段前後矛盾。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 伍-2 洗錢實驗 ================= -->
+<section class="sec" id="s5b">
+  <div class="sec-h"><span class="num">伍-2</span><h2>實驗結果：金融帳戶（防洗錢）</h2><span class="en">Results — Anti-Money-Laundering</span></div>
+  <p class="sec-sum">第二個案例的角色是「KS 方法的外部驗證」：比較 17 種特徵選擇法，再疊加 DFS。</p>
+
+  <article class="row" id="p47">
+    <div>
+      <div class="pno"><span class="id">¶47</span>結果 · 表二十九 KS 對比 17 種特徵選擇法<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="m">我們參考了 Sechidis(2019) 所提出的 17 種不同的特徵選擇方法……並且使用其套件做特徵選擇實驗，並比較其特徵選擇後與 Komlogorov-Smirnov Test 的表現結果</mark>。……<mark class="e">從表二十九可以看出，以 Kolmogorov-Smirnov Test 做特徵選擇，其模型預測表現較其他特徵選方法好</mark>。<mark class="t">另外我們亦可以發現到，若使用 Kolmogorov-Smirnov test 便能精確地捕捉到 LOF 和 KNN_Distances 此二個對模型訓練有害的特徵，也因此其 F1 Score 便能顯著優於其他方法，故在此一實驗足以證明 Kolmogorov-Smirnov test 作為特徵選擇的有效性</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表二十九 F1（不篩選／KS）：比例 0.5 0.340／0.685｜0.6 0.029／0.754｜0.7 0.658／0.747｜0.8 0.741／0.704｜0.9 0.828／0.786</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>外部驗證的主要證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>在第二個領域重現主命題，並以 17 個競爭方法作為參照組，強化「KS 不只是有效，而且較優」。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">拿大量既有方法做橫向比較，論證比只和「不篩選」比強得多。</span><span class="flaw">但在比例 0.8、0.9 時，不篩選的 F1（0.741、0.828）其實<b>高於</b> KS（0.704、0.786），「KS 普遍較佳」只在較小的訓練比例下成立。正例很少（比例 0.6 時 recall 0.0149 ≈ 只抓到 1 個），F1 的劇烈跳動可能只差一兩個樣本。KS 若是用訓練集對測試集做檢定，也有 ¶42 的洩漏問題。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p48">
+    <div>
+      <div class="pno"><span class="id">¶48</span>結果 · 表三十 判別式學習比較<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">從表三十可以看出， Kolmogorov-Smirnov Test 特徵選擇後在 Discriminative Learning 下的 F1 Score 較其他特徵選擇方法低</mark>，<mark class="t">也就表示透過 Kolmogorov-Smirnov Test 將訓練集和測試集的特徵分佈有顯著差異之特徵篩選掉後，可以解決掉資料集偏移問題，使得其模型預測表現較優於其他特徵選擇方法</mark>（如表二十九）。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表三十 判別 F1（訓練／測試，剔除 2 個特徵）：不篩選在比例 0.5→0.9 由 0.644 降到 0.035｜比例 0.8 時 KS 0.054／0.0085，其他方法約 0.99／0.22–0.26</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>機制證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>補上「為什麼 KS 比較好」的機制：因為它真的降低了偏移。結構上與保險案例的 ¶36、¶43 平行。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">即使不做篩選，判別 F1 也會隨比例從 0.64 單調降到 0.03，顯示這個 F1 主要反映的是兩邊的樣本數比例，而不是偏移程度。KS 那一列連判別器的「訓練」F1 都只有 0.02～0.67，說明判別器在訓練集上就學不太起來，跟其他方法（訓練 F1 都在 0.98 以上）不在同一個狀態，可能是實驗設定不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p49">
+    <div>
+      <div class="pno"><span class="id">¶49</span>結果 · 表三十一～三十三 DFS + KS<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">最終我們生成的特徵所建構的洗錢帳戶預測模型表現如表三十一所示，從中我們可以發現到模型的表現比起辛宥言(2021) 【1】有較好的表現</mark>……<mark class="e">從中可以發現到在 Kolmogorov-Smirnov test 做特徵選擇後，Random Forest 模型的 F1 Score 又可以再有所改善</mark>，則表示 Kolmogorov-Smirnov test 特徵選擇可以改善 dataset shift 的問題，增加模型的表現能力。<mark class="c">然而我們繼續從表三十一、表三十二觀察，Deep Feature Synthesis 對 Xgboost 和 LGBM 未能提升效能，反而對隨機森林可以有較好的效果</mark>，我們推測其原因可能是由於 Xgboost 和 LGBM 的訓練會透過梯度上升的演算法來進行……<mark class="c">然而在隨機森林則是將特徵皆視為獨立</mark></p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表三十一～三十三 F1：RF＋DFS 0.789 → ＋KS 0.796（前作最佳 0.739）｜NN 0.123 → 0.520｜XGBoost 0.029 → 0.029｜判別測試 F1：0.9999 → 0.7565</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>證據＋讓步並陳</strong></div>
+      <dl><dt>邏輯角色</dt><dd>在洗錢案例重現「DFS + KS」的組合效果，並勝過前作，是外部效度的高點。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">主動報告方法對某些模型無效，而非只挑好的結果。</span><span class="flaw">XGBoost／LightGBM 的 F1 從 0.73 崩到 0.03，幾乎等於全部預測為負，這更像是超參數或不平衡設定出了問題，而不是「梯度提升怕雜訊」。「隨機森林各特徵獨立」的理由同樣不正確（見 ¶31）。主結論只依賴一個模型（RF）的 0.007 改善，基礎薄弱。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 伍-3 配對交易 ================= -->
+<section class="sec" id="s5c">
+  <div class="sec-h"><span class="num">伍-3</span><h2>實驗結果：配對交易</h2><span class="en">Results — Pairs Trading</span></div>
+  <p class="sec-sum">第三個案例把「分佈穩定性」連結到投資報酬，是最接近財務實務的佐證。</p>
+
+  <article class="row" id="p50">
+    <div>
+      <div class="pno"><span class="id">¶50</span>結果 · 表三十四 三種特徵的交易報酬<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="e">我們可以發現到，運用價差交易所建構之模型所預測的策略，其報酬會優於以股價過程或報酬過程為特徵的模型</mark>。<mark class="t">在表三十四此實驗結果下，我們推測造成此一現象的原因應與資料集偏移問題有關</mark>，故我們更進一步透過 Discriminative Learning 進行驗證實驗。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表三十四 獲利（價差 S／報酬 R／股價 P）：8 月訓練→9 月 164.19／140.51／119.35｜9 月→10 月 87.74／39.12／97.37｜10 月→12 月 60.61／77.17／107.62</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>結果證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>先建立「價差表現最好」的結果，下一段再給出偏移的機制解釋。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「大致」很重要：10 組訓練／測試組合中，至少有 2 組（9 月訓練測 10 月：87.74 對 97.37；10 月訓練測 12 月：60.61 對 107.62）是股價過程勝出。沒有交易成本、風險調整或統計檢定，也沒有報告樣本外的夏普比率。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p51">
+    <div>
+      <div class="pno"><span class="id">¶51</span>結果 · 表三十五 判別式學習<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">由 Discriminative Learning 所評估出來的準確度（Accuracy）和 F1 Score 應當越低越好，表示較無資料集偏移的問題……<mark class="e">從中我們可以看出在價差過程中，準確度（Accuracy）和 F1 Score 皆會比股價過程和報酬過程的低</mark>，<mark class="t">也就是表示價差過程較無資料集偏移問題，因此在表三十四的模型預測中，以價差過程作為特徵的模型泛化能力較好，故報酬也較高</mark>。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據</span>表三十五 2016 年 6 月對 7 月判別準確率：價差 0.936｜股價 0.982｜報酬 0.972</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>機制證據・連結報酬</strong></div>
+      <dl><dt>邏輯角色</dt><dd>完成第三個案例的「表現 ↔ 偏移」對應，讓主命題橫跨三個財金場景。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">0.936 的判別準確率依然非常高，三種特徵<b>都</b>有嚴重偏移，只是程度不同。從「偏移較小」跳到「所以報酬較高」是相關而非因果的推論；如 ¶11 所說，共整合價差本來就被設計成平穩序列，偏移較小幾乎是定義使然。這個案例也沒有真正使用 KS 特徵選擇，與主命題的連結比較間接。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 陸 結論 ================= -->
+<section class="sec" id="s6">
+  <div class="sec-h"><span class="num">陸</span><h2>結論</h2><span class="en">Conclusion</span></div>
+  <p class="sec-sum">三段分別總結：保險特徵工程的發現、資料集偏移的處理與限制、DFS 對稀缺金融資料的價值。</p>
+
+  <article class="row" id="p52">
+    <div>
+      <div class="pno"><span class="id">¶52</span>結論 · 保險特徵工程<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="t">我們在保險資料集中，由特徵工程方法，發現到業務員資訊對於保單成交預測是為有幫助的資訊</mark>……<mark class="c">另外，從我們的實驗中亦可以發現到，客戶財富等級和忠誠度等級的順序性對於保單預測結果影響不大。在保單成交預測的實驗上，我們得出使用 AutoEncoder 對特徵進行降維，對模型的表現反而會造成下降的現象</mark>……<mark class="t">在我們的實驗中，Oversampling 或已成交保單樣本權重設定為 未成交保單數量／已成交保單數量 和未成交保單樣本權重設定為 1，方能使模型的 F1 Score 表現較佳</mark>。而使用梯度更新方法（如 Khan et al.(2017)【8】論文所提出的樣本權重矩陣迭代方法）動態調整不同樣本的權重，其模型表現反而變差許多。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>總結・次要論點收束</strong></div>
+      <dl><dt>邏輯角色</dt><dd>回收子論點三（權重）與保險特徵的次要發現。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">結論的語氣（「方能使 F1 最大化」）比證據（0.381 對 0.379、局部收斂）強很多，屬於證據與主張強度不對稱。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p53">
+    <div>
+      <div class="pno"><span class="id">¶53</span>結論 · 資料集偏移<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig"><mark class="t">資料集偏移問題部分，我們透過保險資料集、金融帳戶資料集和配對交易資料集驗證出 dataset shift 問題可以透過 Kolmogorov-Smirnov test 進行特徵選擇，以捨棄訓練集和測試集分佈不同的特徵方式解決</mark>。……<mark class="t">故我們推測應是當特徵提供的資訊足夠充分（即模型 underfitting 問題較輕時），將訓練集和測試集中，P 值較小的特徵捨去掉，著實可以使模型的表現更佳</mark>。<mark class="c">然而我們亦發現到，若在測試集期間若有如法規變動等的事件發生，抑或是特徵會不停因時而變，則在訓練集和驗證集上做 Kolmogorov-Smirnov test 特徵選擇，嘗試要捨棄測試集跟訓練集分佈相異的特徵，可能會捨棄過多的特徵，或是錯誤地捨棄對模型預測有效的特徵，從而未能使模型的表現變好</mark>。</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>主論點重申＋適用邊界</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文主命題的最終版本，並附上兩個前提條件：資訊充足、沒有結構斷點。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">把失敗案例寫成「適用條件」，是成熟的結論寫法。</span><span class="flaw">但附上條件之後，主張其實大幅縮水：KS 只在「平穩期＋資訊充足」時有效，而這恰好是最不需要處理偏移的情境。「三份資料都驗證了」也言過其實：保險只在避開法規期後成立，配對交易沒有實際做 KS 篩選。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p54">
+    <div>
+      <div class="pno"><span class="id">¶54</span>結論 · DFS 與稀缺的金融資料<span class="src-tag orig">作者中文原文・節錄</span></div>
+      <p class="orig">另外，基於金融資料是相當稀缺的，<mark class="c">故當我們建模時可能較難以增加特徵的數量來加強機器學習模型的表現，進而出現 underfitting 問題</mark>。<mark class="t">因此我們提出 Deep Feature Synthesis 將會是可以更完整地做特徵萃取的一個特徵自動生成的方法。藉由其透過表格間的關聯性來幫助模型產生特徵，進而解決 underfitting（抑或是 High Bias）的問題，提供模型更多的特徵表示方式，增加模型從特徵中可以取得的資訊</mark>。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>收束全文・回扣摘要</strong></div>
+      <dl><dt>邏輯角色</dt><dd>回到摘要 ¶2 的子論點一，首尾呼應，形成「人工有限 → DFS 補足」的閉環。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">首尾呼應的結構完整。</span><span class="flaw">「金融資料稀缺」與保險資料的 50 萬筆樣本並不吻合；真正稀缺的是正例和穩定期，而不是資料量。結論也沒有提出未來研究方向，例如針對結構斷點的偏移調適方法，或多次切分的穩健性檢驗。</span></dd></dl>
+    </aside>
+  </article>
+</section>
+
+<!-- ================= 論證結構總覽 ================= -->
+<section class="map" id="map">
+  <h2>論證結構總覽</h2>
+  <p class="sub">全文邏輯骨架：問題 → 論點 → 證據 → 反駁 → 結論（點選段號可跳回原段）</p>
+
+  <div class="chain">
+    <div class="step" style="--sb:var(--r-b)">
+      <h3>問題<small>PROBLEM</small></h3>
+      <ul>
+        <li>財金資料有<b>資料集偏移</b>：訓練與測試的特徵分佈不同，模型無法泛化 <a href="#p5">¶5</a></li>
+        <li>人工特徵工程<b>無法窮盡</b>好的表示法，模型欠擬合 <a href="#p2">¶2</a></li>
+        <li>正例稀少，<b>類別不平衡</b> <a href="#p16">¶16</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--y-b)">
+      <h3>論點<small>THESIS</small></h3>
+      <ul>
+        <li><b>以分佈穩定性選特徵</b>：用 KS 剔除前後分佈不一的特徵 <a href="#p3">¶3</a></li>
+        <li><b>以 DFS 補資訊</b>：跨表自動生成特徵治療欠擬合 <a href="#p26">¶26</a></li>
+        <li>類別比例權重即為 F1 最適權重 <a href="#p4">¶4</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--b-b)">
+      <h3>證據<small>EVIDENCE</small></h3>
+      <ul>
+        <li>保險：避開法規後 DFS+KS 測試 F1 0.351→0.418，判別 F1 1.0→0.535 <a href="#p43">¶43</a></li>
+        <li>洗錢：KS 優於 17 種篩選法，DFS+KS 的 RF 達 0.796 <a href="#p47">¶47</a> <a href="#p49">¶49</a></li>
+        <li>配對交易：價差偏移最小、報酬最高 <a href="#p51">¶51</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--g-b)">
+      <h3>反駁處理<small>REBUTTAL</small></h3>
+      <ul>
+        <li>KS 在保險資料失效 → 歸因於 2020/7 金管會法規＋欠擬合 <a href="#p37">¶37</a></li>
+        <li>以對照組排除「特徵變少」的解釋 <a href="#p36">¶36</a></li>
+        <li>以 EDA 比例標準化確認法規造成的衝擊 <a href="#p38">¶38</a></li>
+        <li>預先處理「KS 不適用類別變數」的異議 <a href="#p13">¶13</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--navy)">
+      <h3>結論<small>CONCLUSION</small></h3>
+      <ul>
+        <li>KS 可處理偏移，前提是<b>資訊充足、沒有結構斷點</b> <a href="#p53">¶53</a></li>
+        <li>DFS 能為稀缺的金融資料解決欠擬合 <a href="#p54">¶54</a></li>
+        <li>業務員特徵有用；比例權重優於 Khan 的方法 <a href="#p52">¶52</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="oneline"><span>作者核心主張 · 一句話版本</span>在財金機器學習中，先用深度特徵合成補足資訊、再用 KS 檢定剔除訓練與測試分佈不一致的特徵，能同時緩解欠擬合與資料集偏移；但若測試期出現法規之類的結構斷點，這套方法就會失效。</div>
+
+  <div class="vs">
+    <div class="strong">
+      <h4>✦ 論證最強處</h4>
+      <b>保險資料「避開法規期」實驗（表二十三），加上判別式學習的對照組設計（表十八）。</b>在沒有使用測試集的設定下，預測 F1（0.351 → 0.393 → 0.418）與判別 F1（1.0 → 0.535）同時朝預期方向移動，兩條獨立證據互相印證。再配合「刪除 p=1 特徵」的對照組，排除了「只是特徵變少」的替代解釋，是全文最接近因果論證的部分。<a href="#p43" style="font-size:12px">→ ¶43</a> <a href="#p36" style="font-size:12px">→ ¶36</a>
+    </div>
+    <div class="weak">
+      <h4>✦ 論證最弱處</h4>
+      <b>多處評估流程使用了測試集資訊，削弱了核心數字的可信度。</b>所有保險實驗都以「測試 F1 最高的 epoch」報告結果（¶31）；在 KS 連續失效後，作者又改用「訓練集對測試集」做 KS 來證明方法可行（表二十二，¶42），直接違反自己在 ¶23 定下的原則。再加上全文都是單一切分、沒有重複實驗或信賴區間，許多「顯著改善」（例如 0.368 → 0.386、0.789 → 0.796）都落在可能的隨機誤差範圍內。<a href="#p31" style="font-size:12px">→ ¶31</a> <a href="#p42" style="font-size:12px">→ ¶42</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  原典：白建濠（2022）《自動特徵生成方法與資料集偏移問題於財務機器學習模型探討》，國立陽明交通大學財務金融碩士班碩士論文，指導教授戴天時。<br>
+  本頁為研讀用批注；左欄為作者原文節錄（僅修正明顯錯字），表格數據摘自原文表一至表三十五。
+</footer>
+
+<script>
+// 圖例：切換各維度高亮
+document.querySelectorAll('.legend button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+    document.body.classList.toggle('off-' + btn.dataset.k, on);
+  });
+});
+// 章節導航：目前位置高亮
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.secnav a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var secs = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) {
+        links.forEach(function(l){ l.classList.remove('on'); });
+        var a = map[e.target.id];
+        if (a) {
+          a.classList.add('on');
+          // 只橫向捲動導航列本身，不用 scrollIntoView（sticky 元素會把整頁拉回頂端）
+          var bar = a.parentNode;
+          bar.scrollLeft = a.offsetLeft - (bar.clientWidth - a.offsetWidth) / 2;
+        }
+      }
+    });
+  }, {rootMargin:'-70px 0px -70% 0px'});
+  secs.forEach(function(s){ io.observe(s); });
+})();
+</script>
+</body>
+</html>

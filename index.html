@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>論文研讀批注</title>
+<meta name="description" content="學術論文雙欄批注：原文高亮、逐段論證分析與論證結構總覽。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+TC:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#14213d; --navy-2:#22325a; --paper:#faf7f0; --card:#fffdf8; --ink:#2b2924; --muted:#706a5c; --line:#ddd5c3;
+  --gold:#d9a800; --ui:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif; --serif:"Lora","Noto Serif TC",Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+header{background:var(--navy);color:#e9ecf3;padding:44px 0 36px}
+header .kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.65}
+header h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,4vw,36px);margin:8px 0 10px}
+header p{margin:0;max-width:640px;font-size:15px;line-height:1.75;opacity:.82}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;font-size:12.5px;opacity:.85}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:30px 0 18px}
+.search{flex:1 1 280px;position:relative}
+.search input{width:100%;font:15px var(--ui);padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.search input:focus{outline:2px solid var(--navy);outline-offset:1px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.count{font-size:13.5px;color:var(--muted)}
+.tags-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.tags-filter button{font:500 12.5px var(--ui);border:1px solid var(--line);background:#fff;color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+.tags-filter button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:18px;margin-bottom:40px}
+.card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--navy);border-radius:10px;padding:20px 22px 18px;display:flex;flex-direction:column;transition:box-shadow .2s, transform .2s}
+.card:hover{box-shadow:0 8px 24px rgba(20,33,61,.10);transform:translateY(-2px)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.badge{font:600 11px var(--ui);letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:#efe9da;color:#6a5a2e}
+.badge.lang{background:#e6ecf7;color:#2c4a7a}
+.card h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:19px;line-height:1.5;margin:0 0 4px}
+.card .en{font-family:"Lora",serif;font-style:italic;font-size:14px;color:var(--muted);line-height:1.5;margin:0 0 10px}
+.card .meta{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 10px}
+.card .sum{font-size:14px;line-height:1.75;color:#4a463c;margin:0 0 14px;flex:1}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.card .tags span{font-size:12px;color:#5d5747;border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+.card .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:14px}
+.card .stat{font-size:12.5px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;text-decoration:none;font:600 14px var(--ui);padding:10px 16px;border-radius:7px}
+.btn:hover{background:var(--navy-2)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:50px 0;font-size:15px}
+
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8;padding:22px 0 40px}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  header{padding:32px 0 26px}
+  .card{padding:18px 16px 16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">Paper Close Reading</div>
+    <h1>論文研讀批注</h1>
+    <p>每篇論文都整理成雙欄批注：左欄是原文與五色高亮，右欄是逐段的功能、邏輯角色與論證漏洞分析，最後附上全文的論證結構總覽。</p>
+    <div class="legend" aria-label="高亮顏色說明">
+      <span><i style="background:#fff0a3;box-shadow:inset 0 -2px 0 #d9a800"></i>核心論點</span>
+      <span><i style="background:#fbd3cc;box-shadow:inset 0 -2px 0 #c4402c"></i>關鍵概念</span>
+      <span><i style="background:#d5e6fb;box-shadow:inset 0 -2px 0 #2c6db3"></i>實證證據</span>
+      <span><i style="background:#d5efd7;box-shadow:inset 0 -2px 0 #358a45"></i>讓步／反駁</span>
+      <span><i style="background:#e8dcf8;box-shadow:inset 0 -2px 0 #7449b0"></i>方法論</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="toolbar">
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="搜尋標題、作者、關鍵字…" aria-label="搜尋論文">
+    </label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tags-filter" id="tagbar" aria-label="依主題篩選"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div class="wrap">批注為個人研讀用途；左欄原文節錄自各論文，著作權屬原作者所有。引用時請以原論文為準。</div>
+</footer>
+
+<script>
+/* ============================================================
+   論文清單：新增一篇論文時，只要
+   1) 把該篇的 .html 放進 papers/ 資料夾（檔名用英文、數字、連字號）
+   2) 在下面 PAPERS 陣列最前面複製一個 { ... } 區塊，改成新論文的資料
+   ============================================================ */
+const PAPERS = [
+  {
+    file: "papers/2022-auto-feature-dataset-shift.html",
+    title: "自動特徵生成方法與資料集偏移問題於財務機器學習模型探討",
+    titleEn: "Automatic Feature Generation and Insight of Dataset Shift in Finance Machine Learning Models",
+    author: "白建濠",
+    advisor: "戴天時",
+    school: "國立陽明交通大學 資訊管理與財務金融學系 財務金融碩士班",
+    type: "碩士論文",
+    year: 2022,
+    lang: "中文",
+    tags: ["機器學習", "資料集偏移", "特徵工程", "保險", "防洗錢", "配對交易"],
+    summary: "以 KS 檢定剔除訓練／測試分佈不一的特徵來處理資料集偏移，並以深度特徵合成（DFS）補足欠擬合；在保單成交、洗錢偵測、配對交易三個案例中驗證。",
+    paragraphs: 54,
+    added: "2026-11-06"
+  }
+];
+
+const grid = document.getElementById("grid");
+const q = document.getElementById("q");
+const tagbar = document.getElementById("tagbar");
+const count = document.getElementById("count");
+let activeTag = null;
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// 主題篩選按鈕
+const allTags = [...new Set(PAPERS.flatMap(p => p.tags))];
+function renderTags(){
+  tagbar.innerHTML = ['全部', ...allTags].map(t =>
+    `<button type="button" data-t="${esc(t)}" aria-pressed="${(t === '全部' && !activeTag) || t === activeTag}">${esc(t)}</button>`).join("");
+}
+tagbar.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  activeTag = b.dataset.t === "全部" ? null : b.dataset.t;
+  renderTags(); render();
+});
+
+function render(){
+  const kw = q.value.trim().toLowerCase();
+  const list = PAPERS
+    .filter(p => !activeTag || p.tags.includes(activeTag))
+    .filter(p => !kw || [p.title, p.titleEn, p.author, p.advisor, p.school, p.summary, ...p.tags].join(" ").toLowerCase().includes(kw))
+    .sort((a, b) => b.added.localeCompare(a.added));
+  count.textContent = `共 ${list.length} / ${PAPERS.length} 篇`;
+  grid.innerHTML = list.length ? list.map(p => `
+    <article class="card">
+      <div class="badges"><span class="badge">${esc(p.type)} · ${p.year}</span><span class="badge lang">${esc(p.lang)}</span></div>
+      <h2>${esc(p.title)}</h2>
+      <p class="en">${esc(p.titleEn)}</p>
+      <p class="meta">${esc(p.author)}${p.advisor ? "（指導教授 " + esc(p.advisor) + "）" : ""}<br>${esc(p.school)}</p>
+      <p class="sum">${esc(p.summary)}</p>
+      <div class="tags">${p.tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>
+      <div class="foot">
+        <span class="stat">${p.paragraphs} 段批注 · 加入於 ${esc(p.added)}</span>
+        <a class="btn" href="${esc(p.file)}">閱讀批注 <span aria-hidden="true">→</span></a>
+      </div>
+    </article>`).join("") : `<div class="empty">找不到符合的論文</div>`;
+}
+q.addEventListener("input", render);
+renderTags(); render();
+</script>
+</body>
+</html>
