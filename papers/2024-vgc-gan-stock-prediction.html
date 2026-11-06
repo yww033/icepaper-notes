@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VGC-GAN 批注</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#14213d; --navy-2:#22325a; --navy-ink:#e9ecf3;
+  --paper:#faf7f0; --card:#fffdf8; --ink:#2b2924; --muted:#706a5c; --line:#ddd5c3;
+  --zh-bg:#f0ece2; --zh-rule:#b5a682;
+  --y:#fff0a3; --y-b:#d9a800; --y-bg:#fffaf0;
+  --r:#fbd3cc; --r-b:#c4402c; --r-bg:#fdf3f1;
+  --b:#d5e6fb; --b-b:#2c6db3; --b-bg:#f2f7fd;
+  --g:#d5efd7; --g-b:#358a45; --g-bg:#f2f9f2;
+  --p:#e8dcf8; --p-b:#7449b0; --p-bg:#f7f2fd;
+  --ui:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif;
+  --serif:"Lora","Noto Serif TC",Georgia,serif;
+  --zh:"Noto Serif TC","Songti TC",serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* ===== 頂部導航 ===== */
+.top{background:var(--navy);color:var(--navy-ink);padding:22px 0 18px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+.top .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.top h1{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.6vw,28px);line-height:1.35;margin:6px 0 4px}
+.top .en-title{font-family:"Lora",serif;font-style:italic;font-size:15px;opacity:.85}
+.top .meta{font-size:13px;opacity:.75;margin-top:8px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.legend .lbl{font-size:12px;opacity:.7;margin-right:4px}
+.legend button{font:500 12.5px var(--ui);border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--navy-ink);
+  padding:5px 10px 5px 8px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.legend button i{width:14px;height:14px;border-radius:3px;display:inline-block}
+.legend button[aria-pressed="false"]{opacity:.4;text-decoration:line-through}
+.legend .hint{font-size:11.5px;opacity:.55;margin-left:6px}
+
+/* ===== 章節導航（sticky） ===== */
+.secnav{position:sticky;top:0;z-index:20;background:var(--navy-2);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.secnav .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
+.secnav .wrap::-webkit-scrollbar{display:none}
+.secnav a{flex:none;text-decoration:none;color:#cdd3e2;font-size:13px;padding:6px 11px;border-radius:6px;white-space:nowrap}
+.secnav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.secnav a.on{background:#fff;color:var(--navy);font-weight:600}
+
+/* ===== 說明框 ===== */
+.intro{margin:28px auto 8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;font-size:14px;line-height:1.75;color:#4a463c}
+.intro b{color:var(--ink)}
+.intro ul{margin:6px 0 0;padding-left:20px}
+
+/* ===== 欄位標題 ===== */
+.colhead{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:32px;margin-top:26px;
+  font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--navy);padding-bottom:8px}
+
+/* ===== 章節 ===== */
+.sec{padding-top:10px}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin:38px 0 4px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sec-h .num{font:600 13px var(--ui);color:#fff;background:var(--navy);border-radius:5px;padding:3px 9px}
+.sec-h h2{margin:0;font-family:var(--zh);font-weight:600;font-size:22px}
+.sec-h .en{font-family:"Lora",serif;font-style:italic;color:var(--muted);font-size:15px}
+.sec-sum{font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.7}
+
+/* ===== 段落列 ===== */
+.row{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:32px;padding:24px 0;border-bottom:1px dashed var(--line)}
+.pno{font:500 12px var(--ui);color:var(--muted);letter-spacing:.04em;margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pno .id{font-weight:600;color:var(--navy)}
+.pno .src-tag{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:#fff}
+.pno .src-tag.orig{border-color:#c9b98f;background:#fbf6e6;color:#7a6326}
+p.en{font-family:"Lora",Georgia,serif;font-size:16.5px;line-height:1.78;margin:0;color:#25231f;hyphens:auto}
+hr.sep{border:0;border-top:1px solid var(--line);margin:14px 0}
+.zh{background:var(--zh-bg);border-left:2px solid var(--zh-rule);padding:12px 16px;font-family:var(--zh);font-size:15.5px;line-height:1.95;color:#3b372e;margin:0;border-radius:0 4px 4px 0}
+
+mark{color:inherit;padding:0 .12em;border-radius:2px;background:none;transition:background .2s, box-shadow .2s}
+mark.t{background:var(--y);box-shadow:inset 0 -2px 0 var(--y-b)}
+mark.k{background:var(--r);box-shadow:inset 0 -2px 0 var(--r-b)}
+mark.e{background:var(--b);box-shadow:inset 0 -2px 0 var(--b-b)}
+mark.c{background:var(--g);box-shadow:inset 0 -2px 0 var(--g-b)}
+mark.m{background:var(--p);box-shadow:inset 0 -2px 0 var(--p-b)}
+body.off-t mark.t, body.off-k mark.k, body.off-e mark.e, body.off-c mark.c, body.off-m mark.m{background:none;box-shadow:none}
+
+/* ===== 批注卡片 ===== */
+.note{align-self:start;border-left:4px solid var(--nb);background:var(--nbg);border-radius:0 8px 8px 0;padding:14px 16px 12px;font-size:14px;line-height:1.72;color:#37342c}
+.n-t{--nb:var(--y-b);--nbg:var(--y-bg)} .n-k{--nb:var(--r-b);--nbg:var(--r-bg)} .n-e{--nb:var(--b-b);--nbg:var(--b-bg)}
+.n-c{--nb:var(--g-b);--nbg:var(--g-bg)} .n-m{--nb:var(--p-b);--nbg:var(--p-bg)}
+.note .fn{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.note .fn .chip{font:600 11px var(--ui);letter-spacing:.06em;color:#fff;background:var(--nb);padding:2px 8px;border-radius:4px}
+.note .fn strong{font-size:15px;font-family:"Noto Sans TC",var(--ui)}
+.note dl{margin:0}
+.note dt{font:600 11.5px var(--ui);color:var(--muted);letter-spacing:.06em;margin-top:8px}
+.note dd{margin:2px 0 0}
+.note .flaw{color:#8a2f20}
+.note .tech{color:#255d2f}
+
+/* ===== 總覽 ===== */
+.map{margin:56px 0 30px;padding:30px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.map h2{font-family:var(--zh);font-size:24px;margin:0 0 6px}
+.map .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+.chain{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;position:relative}
+.step{background:#fff;border:1px solid var(--line);border-top:5px solid var(--sb);border-radius:8px;padding:14px 14px 12px;font-size:13.5px;line-height:1.7;position:relative}
+.step h3{margin:0 0 6px;font-size:15px;font-family:"Noto Sans TC",var(--ui);display:flex;justify-content:space-between;align-items:baseline}
+.step h3 small{font:500 11px var(--ui);color:var(--muted);letter-spacing:.08em}
+.step ul{margin:0;padding-left:16px}
+.step li{margin:3px 0}
+.step a{color:var(--navy);text-decoration:none;border-bottom:1px dotted var(--navy);font-size:12px}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;background:var(--card);line-height:1}
+.oneline{margin:26px 0 18px;padding:18px 22px;background:var(--navy);color:#fff;border-radius:10px;font-family:var(--zh);font-size:17px;line-height:1.8}
+.oneline span{display:block;font:600 11px var(--ui);letter-spacing:.14em;opacity:.65;margin-bottom:4px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs div{border-radius:8px;padding:16px 18px;font-size:14px;line-height:1.75}
+.vs .strong{background:var(--g-bg);border-left:4px solid var(--g-b)}
+.vs .weak{background:var(--r-bg);border-left:4px solid var(--r-b)}
+.vs h4{margin:0 0 6px;font-size:15px}
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px;line-height:1.7}
+
+@media (max-width:900px){
+  .wrap{padding:0 16px}
+  .row,.colhead{grid-template-columns:1fr;gap:14px}
+  .colhead .r{display:none}
+  .chain{grid-template-columns:1fr}
+  .step:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-15px;transform:translateX(50%)}
+  .vs{grid-template-columns:1fr}
+  .map{padding:20px 16px}
+  p.en{font-size:16px}
+}
+@media print{.secnav{position:static}.legend button{border-color:#999}}
+</style>
+<style>
+.tbl{margin-top:14px;background:var(--b-bg);border:1px solid #cfe0f5;border-radius:6px;padding:9px 13px;font:13.5px/1.8 var(--ui);color:#23476f}
+.tbl-lbl{display:block;font:600 11px var(--ui);letter-spacing:.08em;color:#2c6db3;margin-bottom:4px}
+.top .home{display:inline-block;color:#cdd3e2;text-decoration:none;font-size:13px;margin-bottom:12px;border-bottom:1px dotted rgba(255,255,255,.35)}
+.top .home:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="home" href="../index.html">← 回論文批注首頁</a>
+    <div class="kicker">Paper Close Reading · 雙欄論證批注</div>
+    <h1>VGC-GAN：以多圖卷積對抗網路預測股價</h1>
+    <div class="en-title">VGC-GAN: A multi-graph convolution adversarial network for stock price prediction</div>
+    <div class="meta">Dongbo Ma, Da Yuan, Maojun Huang, Ling Dong · Shandong Technology and Business University · <i>Expert Systems with Applications</i> 236 (2024) 121204 · doi:10.1016/j.eswa.2023.121204</div>
+    <div class="legend" role="group" aria-label="顏色圖例">
+      <span class="lbl">分析維度</span>
+      <button data-k="t" aria-pressed="true"><i style="background:var(--y);box-shadow:inset 0 -2px 0 var(--y-b)"></i>核心論點 Thesis</button>
+      <button data-k="k" aria-pressed="true"><i style="background:var(--r);box-shadow:inset 0 -2px 0 var(--r-b)"></i>關鍵概念／術語</button>
+      <button data-k="e" aria-pressed="true"><i style="background:var(--b);box-shadow:inset 0 -2px 0 var(--b-b)"></i>實證證據／數據</button>
+      <button data-k="c" aria-pressed="true"><i style="background:var(--g);box-shadow:inset 0 -2px 0 var(--g-b)"></i>讓步／反駁處理</button>
+      <button data-k="m" aria-pressed="true"><i style="background:var(--p);box-shadow:inset 0 -2px 0 var(--p-b)"></i>方法論說明</button>
+      <span class="hint">點選可開關該類高亮</span>
+    </div>
+  </div>
+</header>
+
+<nav class="secnav" aria-label="章節導航">
+  <div class="wrap">
+    <a href="#abs">摘要</a>
+    <a href="#s1">1 緒論</a>
+    <a href="#s2">2 相關研究</a>
+    <a href="#s3">3 模型</a>
+    <a href="#s4">4 實驗設計</a>
+    <a href="#s5">5 結果與討論</a>
+    <a href="#s6">6 結論</a>
+    <a href="#map">論證結構總覽</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<div class="intro">
+  <b>閱讀說明</b>
+  <ul>
+    <li><b>左欄英文是重述，不是原文：</b>本論文由 Elsevier 出版，版權所有。為了不轉載原文，左欄是依原文內容<b>用自己的話改寫</b>的英文摘要（每段都標示「英文重述・非原文」），高亮畫在重述上；下方米色區塊是繁體中文譯文。要引用時，請以原論文 PDF 為準。</li>
+    <li><b>藍色「表格數據」框</b>是從原文表一至表十摘錄的數字。</li>
+    <li><b>涵蓋範圍：</b>全文 14 頁，依章節整理成 40 個論證段落（參考文獻與作者聲明不列入）。</li>
+    <li><b>批注卡片顏色</b>對應該段的主要論證功能（黃＝論點、紅＝概念、藍＝證據、綠＝讓步／反駁、紫＝方法）。批注中 <span class="flaw" style="color:#8a2f20">紅字</span> 是潛在漏洞，<span style="color:#255d2f">綠字</span> 是值得學習的論證技巧。</li>
+  </ul>
+</div>
+
+<div class="colhead"><div>英文重述（高亮）＋ 繁體中文譯文</div><div class="r">中文批注 · 功能／角色／技巧與漏洞</div></div>
+
+<section class="sec" id="abs">
+  <div class="sec-h"><span class="num">ABS</span><h2>摘要</h2><span class="en">Abstract</span></div>
+  <p class="sec-sum">整篇論文的縮影：缺口（預設關係圖）→ 方案（資料驅動多圖＋GAN＋VMD）→ 宣稱有效。</p>
+
+  <article class="row" id="p1">
+    <div>
+      <div class="pno"><span class="id">¶1</span>Abstract · 問題與缺口<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">A firm’s price moves are driven not only by its own market signals but also by shocks to related firms. <mark class="c">Most graph-based methods, however, depend on <mark class="k">predefined graphs</mark> — industry, shareholder or event links — that need extra financial data</mark>, which the authors argue <mark class="t">limits generalization and gives an incomplete picture of inter-stock relations</mark>.</p>
+      <hr class="sep">
+      <p class="zh">公司的股價波動，不只來自自身的市場訊號，也會受到相關公司的牽動。然而現有利用股票關聯的方法，大多依賴事先定義好的關係圖（產業、股東或事件關係），必須另外蒐集財務資料。作者認為這會限制模型的泛化能力，也無法完整呈現股票之間的關係。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>引出問題・界定缺口</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文起點：先肯定「股票之間有關聯」，再指出現有作法依賴外部資料，替「只用歷史價格建圖」鋪路。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">「先承認方向對、再指出做法有限」是很標準的缺口論證。</span><span class="flaw">「泛化能力受限」是斷言，摘要和緒論都沒有引用證據說明預設圖的泛化確實比較差。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p2">
+    <div>
+      <div class="pno"><span class="id">¶2</span>Abstract · 提出方案<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">The paper proposes <mark class="t"><mark class="k">VGC-GAN</mark>, a multi-graph convolutional adversarial framework</mark>. <mark class="m">Several correlation graphs are built directly from historical prices</mark> to describe inter-stock links from different angles. A <mark class="k">GAN</mark> trained with an added <mark class="k">MSE loss</mark> uses a <mark class="m">Multi-GCN + GRU generator</mark> and a <mark class="m">CNN discriminator</mark>, combining supervised and adversarial training.</p>
+      <hr class="sep">
+      <p class="zh">本文提出 VGC-GAN：一個多圖卷積的生成對抗架構。它直接從歷史股價建立多張相關性圖，從不同角度描述股票之間的關聯；再以加入 MSE 損失的 GAN 進行訓練，生成器由多圖卷積網路（Multi-GCN）與 GRU 組成，判別器則是 CNN，同時進行監督式與對抗式訓練。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>核心論點（模型主張）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>列出三個組件，正好對應後面消融實驗（表七）拆掉的三塊。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">把模型名稱拆解成組件（V＝VMD、G＝Graph、C＝Convolution、GAN），讀者一眼就知道架構。</span><span class="flaw">組件很多（VMD＋GA＋6 張圖＋GCN＋GRU＋CNN＋WGAN-GP＋MSE），從摘要就看得出模型相當複雜，需要很強的消融與基準比較才能說服人。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p3">
+    <div>
+      <div class="pno"><span class="id">¶3</span>Abstract · 降噪與結論<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">To reduce noise, the generator is fed <mark class="m">sub-series produced by <mark class="k">Variational Mode Decomposition (VMD)</mark> whose parameters are tuned</mark>. <mark class="e">Experiments on several real datasets</mark> are reported to <mark class="t">confirm the model’s effectiveness for stock price prediction</mark>.</p>
+      <hr class="sep">
+      <p class="zh">為了降低雜訊，生成器的輸入是經過參數最佳化的變分模態分解（VMD）子序列。作者在多個真實資料集上進行實驗，宣稱結果證實此模型對股價預測有效。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法補充・結論預告</strong></div>
+      <dl><dt>邏輯角色</dt><dd>補上第三個組件（VMD），並以「實證有效」收尾。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「effectiveness」沒有說相對於什麼基準、提升多少。後面表二的方向準確率只有 0.53～0.57，摘要選擇不提具體數字。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s1">
+  <div class="sec-h"><span class="num">1</span><h2>緒論</h2><span class="en">Introduction</span></div>
+  <p class="sec-sum">從效率市場談起，經過機器學習與混合模型的文獻，指出「股票被當成獨立個體」與「預設圖」兩個缺口，最後列出三項貢獻。</p>
+
+  <article class="row" id="p4">
+    <div>
+      <div class="pno"><span class="id">¶4</span>1 · 預測的難度<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Stock prediction sits between finance and computer science. The <mark class="k">Efficient Market Hypothesis</mark> (Fama, 1970) holds that prices quickly and fully reflect available information, yet prices also respond to <mark class="c">complex non-linear interactions of macro variables, corporate policy, investor psychology and politics</mark>, making prediction hard.</p>
+      <hr class="sep">
+      <p class="zh">股價預測是財務與資訊科學的交會問題。效率市場假說（Fama, 1970）主張股價會迅速且完整地反映所有資訊；但股價同時受到經濟變數、公司政策、投資人心理與政治事件等複雜的非線性交互影響，因此預測相當困難。</p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>背景・引入概念</strong></div>
+      <dl><dt>邏輯角色</dt><dd>以效率市場假說開場，承認預測本身的困難。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">引用效率市場假說之後就沒有再回應它。如果市場接近有效率，最強的基準就是「明天價格＝今天價格」（隨機漫步）；但全文沒有和這個基準比較（見 ¶33）。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p5">
+    <div>
+      <div class="pno"><span class="id">¶5</span>1 · 方法演進<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Statistical models assume linear data-generating processes; <mark class="e">machine-learning and deep-learning models capture non-linear relations and have reported better results</mark>. <mark class="m">Hybrid models — EMD + ANN, VMD + meta-learning, PSO-tuned networks, AdaBoost + LSTM, and LSTM/CNN-based GANs</mark> — have also shown promise.</p>
+      <hr class="sep">
+      <p class="zh">傳統統計模型假設資料由線性過程產生；機器學習與深度學習能捕捉非線性關係，文獻報告的效果較好。此外，結合不同技術的混合模型（EMD＋ANN、VMD＋元學習、PSO 調參的神經網路、AdaBoost＋LSTM，以及用 LSTM／CNN 做對抗訓練的 GAN）也有不錯的表現。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>文獻鋪陳</strong></div>
+      <dl><dt>邏輯角色</dt><dd>替本文的兩個技術選擇（分解＋GAN）找到前例，顯示這是一條有人走過的路。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">這段只列出「誰做了什麼」，沒有說這些方法各自的限制；讀者看不出本文要補的是哪一個缺口。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p6">
+    <div>
+      <div class="pno"><span class="id">¶6</span>1 · 從獨立個體到圖<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="c">Most methods treat stocks as independent and identically distributed</mark>, ignoring inter-stock information. Since a firm is affected by related firms, <mark class="t">the market can naturally be seen as a graph</mark> whose nodes are listed companies. <mark class="k">Graph Convolutional Networks</mark> can exploit such node relations while keeping temporal structure; prior work built graphs from shareholders, news, Spearman correlations or events.</p>
+      <hr class="sep">
+      <p class="zh">多數方法把股票當成獨立同分佈的個體，忽略了股票之間的資訊。既然一家公司會受相關公司影響，股市自然可以看成一張圖：每家上市公司是一個節點。圖卷積網路（GCN）能利用節點之間的關係，同時保留時間結構；過去的研究曾以股東關係、新聞、Spearman 相關係數或事件來建圖。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>核心前提</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文的世界觀：股市＝圖。之後的每個設計都建立在這個前提上。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">用「i.i.d. 假設」這個機器學習術語點出既有方法的盲點，很有說服力。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p7">
+    <div>
+      <div class="pno"><span class="id">¶7</span>1 · 兩個缺口<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Graphs from shareholders, industries or news <mark class="c">need extra data that is costly to collect and may only reflect predefined relation types, adding noise and bias</mark>. Graphs built from price correlations avoid this, but <mark class="t">usually capture only global, simultaneous correlation and miss <mark class="k">local correlation</mark> and <mark class="k">lead–lag relations</mark></mark>.</p>
+      <hr class="sep">
+      <p class="zh">以股東、產業或新聞建立的關係圖，需要額外資料，蒐集與處理既複雜又耗時，而且只能反映預先定義的關係類型，可能帶來雜訊與偏誤。用歷史價格相關係數建圖可以避開這個問題，但現有研究通常只考慮全期、同步的相關性，忽略了局部相關與領先—落後（lead–lag）關係。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>核心論點・精確定位缺口</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這段是全文動機的核心：把缺口縮小到「同步 vs. 非同步」「全局 vs. 局部」兩個維度，正好對應後面的 6 張圖。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">缺口定義得越精確，貢獻就越容易驗證，這段示範得很好。</span><span class="flaw">「預設圖會帶來雜訊與偏誤」同樣適用於價格相關圖（相關係數本身就很不穩定，見 ¶38 的邊數變化），作者只批評對手、沒有檢討自己的方法。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p8">
+    <div>
+      <div class="pno"><span class="id">¶8</span>1 · VGC-GAN 概述<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">VGC-GAN builds graphs from <mark class="m">correlation coefficients and <mark class="k">FastDTW</mark></mark> on price history, covering <mark class="t">both synchronous and asynchronous relations without extra financial data</mark>. A <mark class="k">WGAN</mark> with MSE loss improves robustness; the generator uses Multi-GCN and GRU, the discriminator a CNN. Inputs are VMD sub-series whose parameters are set by a <mark class="m">Genetic Algorithm (GA)</mark>.</p>
+      <hr class="sep">
+      <p class="zh">VGC-GAN 以歷史股價的相關係數與 FastDTW 建圖，同時涵蓋同步與非同步關係，不需要額外的財務資料。架構上採用加入 MSE 損失的 WGAN 來提升穩健性：生成器由 Multi-GCN 與 GRU 組成，判別器為 CNN。輸入資料是經 VMD 分解的子序列，VMD 參數則以基因演算法（GA）最佳化。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法藍圖</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把三個組件逐一對應到前一段的缺口（FastDTW→lead–lag、多圖→多角度、WGAN→穩健性）。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「WGAN 提升穩健性」在這裡是預設前提；但消融實驗（表七）顯示拿掉 GAN 之後，方向準確率幾乎沒變（見 ¶36）。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p9">
+    <div>
+      <div class="pno"><span class="id">¶9</span>1 · 三項貢獻<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">The stated contributions are: <mark class="t">(1) a multi-graph adversarial network capturing inter-stock relations from several perspectives; (2) a GA-based combinatorial optimization of VMD parameters that improves decomposition; (3) validation against existing methods on three real datasets</mark> — <mark class="e">one subscription-based and two public</mark>.</p>
+      <hr class="sep">
+      <p class="zh">作者列出三項貢獻：(1) 提出能從多個角度捕捉股票關聯的多圖對抗網路；(2) 以 GA 為基礎的組合最佳化方法來設定 VMD 參數，改善分解效果；(3) 在三個真實資料集（一個付費訂閱、兩個公開）上與既有方法比較，驗證模型的有效性。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>貢獻宣告</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這是全文的「合約」：後面的實驗應該逐一兌現這三項。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">貢獻條列化，方便審稿人對照檢查。</span><span class="flaw">貢獻 (2) 中的「GA＋殘差相關」並非本文首創（作者自己引用 Jia et al., 2021 的殘差相關理論）。另外，論文最後寫「資料可依請求提供」，沒有公開程式碼，第 (3) 項很難被獨立重現。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s2">
+  <div class="sec-h"><span class="num">2</span><h2>相關研究</h2><span class="en">Related Work</span></div>
+  <p class="sec-sum">依「統計 → 機器學習 → 深度學習 → 分解混合 → GAN → 圖神經網路」的時間線鋪陳，把本文放在最後一站。</p>
+
+  <article class="row" id="p10">
+    <div>
+      <div class="pno"><span class="id">¶10</span>2 · 統計與傳統機器學習<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Early stock prediction used linear statistical models such as <mark class="k">GARCH</mark> and <mark class="k">ARIMA</mark>, whose accuracy is limited by the chaotic nature of prices. <mark class="e">SVM, decision trees, ANN and random forests</mark> followed, e.g. SVM with hybrid feature selection and tree-based trend classifiers.</p>
+      <hr class="sep">
+      <p class="zh">早期的股價預測使用 GARCH、ARIMA 等線性統計模型，但股價的混沌與不穩定特性限制了它們的準確度。之後出現了 SVM、決策樹、類神經網路、隨機森林等機器學習方法，例如結合混合特徵選擇的 SVM、以樹模型預測漲跌趨勢等。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>文獻脈絡</strong></div>
+      <dl><dt>邏輯角色</dt><dd>建立「線性方法不夠 → 非線性方法」的演進敘事。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">引用對調：原文把 GARCH 標給 Hyndman & Athanasopoulos (2018)、ARIMA 標給 Bollerslev (1986)，但 GARCH 才是 Bollerslev 提出的，屬於明顯的引用錯誤。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p11">
+    <div>
+      <div class="pno"><span class="id">¶11</span>2 · 深度學習<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">CNN, LSTM, GRU and attention</mark> became popular for capturing non-linear spatio-temporal dependence. LSTM addresses vanishing gradients; <mark class="k">GRU</mark> is a lighter LSTM variant with fewer parameters and faster training. Variants include LSTM ensembles, multi-output LSTM, K-means + LSTM, RL-based GRU and particle-filter RNNs.</p>
+      <hr class="sep">
+      <p class="zh">CNN、LSTM、GRU 與注意力機制，因為能捕捉非線性的時空依賴而廣受採用。LSTM 解決了梯度消失問題；GRU 是較精簡的 LSTM 變體，參數較少、訓練較快。延伸作法包括雙 LSTM、多輸入多輸出 LSTM、K-means＋LSTM、以強化學習改良的 GRU，以及結合粒子濾波的 RNN 等。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>文獻脈絡・選擇 GRU 的伏筆</strong></div>
+      <dl><dt>邏輯角色</dt><dd>預先說明 GRU 的優點（輕量、快），合理化生成器選用 GRU。</dd>
+      <dt>技巧／漏洞</dt><dd>—</dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p12">
+    <div>
+      <div class="pno"><span class="id">¶12</span>2 · 分解混合模型與 GAN<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="m">Hybrid models first decompose a series into frequency bands or smoother sub-series, then model each with deep learning</mark> (wavelet + LSTM, VMD + LSTM). Notably, <mark class="c">Liu et al. (2022) decompose rolling windows instead of the whole series to remove <mark class="k">look-ahead bias</mark></mark>. GANs have also been applied, e.g. LSTM/CNN adversarial training and multi-attention GANs.</p>
+      <hr class="sep">
+      <p class="zh">分解混合模型先把序列拆成不同頻率或較平穩的子序列，再分別以深度學習建模，例如小波＋LSTM、VMD＋LSTM。值得注意的是，Liu 等人（2022）改成對滾動視窗做分解、而不是對整條序列分解，以消除前視偏誤（look-ahead bias）。GAN 也已被用於股價預測，例如以 LSTM／CNN 進行對抗訓練、多注意力 GAN 等。</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>文獻脈絡・提到關鍵風險</strong></div>
+      <dl><dt>邏輯角色</dt><dd>作者自己在文獻中點出了「分解會造成前視偏誤」這個已知陷阱。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">既然知道整條序列分解會偷看未來，作者在 ¶28 的作法卻仍是「用同一組參數分解整段測試集」，並沒有採用 Liu 等人的滾動視窗分解。這是全文最需要追問的方法問題。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p13">
+    <div>
+      <div class="pno"><span class="id">¶13</span>2 · 圖神經網路<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Prices depend on related stocks as well as their own history. Multivariate methods model variables separately and may under-use their dependencies; <mark class="k">Graph Neural Networks</mark> assume a node’s state depends on its neighbours. <mark class="e">GNN applications to stocks remain relatively limited</mark>: company-relation graphs, graph-convolutional CNNs, <mark class="k">Multi-GCGRU</mark> on predefined graphs, HTAR and THGNN.</p>
+      <hr class="sep">
+      <p class="zh">股價不只取決於自身歷史，也取決於相關股票。多變量時間序列方法通常分別建模各變數，可能沒有充分利用變數之間的依賴；圖神經網路則假設節點狀態取決於鄰居，能捕捉節點之間的空間依賴。GNN 在股價預測上的應用相對較少，例如公司關係圖、圖卷積特徵 CNN、以預設圖萃取交叉效應的 Multi-GCGRU、HTAR 與 THGNN 等。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>定位本文</strong></div>
+      <dl><dt>邏輯角色</dt><dd>以「GNN 用在股市的研究仍少」強調新穎性。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">Multi-GCGRU、THGNN 都是最接近本文的方法（多圖＋GRU、動態關係圖），卻沒有被放進基準比較（表二），只比了較弱或不同類型的模型。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s3">
+  <div class="sec-h"><span class="num">3</span><h2>模型</h2><span class="en">Model</span></div>
+  <p class="sec-sum">三大模組依序展開：序列分解（VMD＋GA）→ 關係圖生成（Pearson／Spearman／FastDTW × 全局／局部）→ 生成對抗模組（Multi-GCN＋GRU 對 CNN，WGAN-GP＋MSE）。</p>
+
+  <article class="row" id="p14">
+    <div>
+      <div class="pno"><span class="id">¶14</span>3.1 · 問題定義<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">The task is framed as <mark class="k">multivariate time-series forecasting with a prior weighted graph</mark>: nodes are stocks, edge weights are relation strengths (e.g. Pearson or DTW). <mark class="m">Given the graph and the closing prices of all N stocks over a window of length L, a function f predicts the next-day closing price of target stock i</mark>.</p>
+      <hr class="sep">
+      <p class="zh">預測任務被定義為「帶有先驗加權圖的多變量時間序列預測」：節點是股票，邊的權重代表關係強度（例如 Pearson 或 DTW）。給定這張圖，以及 N 檔股票在長度 L 的視窗內的收盤價，學習一個函數 f，預測目標股票 i 下一個交易日的收盤價。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>形式化定義</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把「價格水準」而非「報酬」設為預測目標，這個選擇影響後面所有評估指標的解讀。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">預測價格水準時，因為股價高度自我相關，RMSE、MAE 很容易看起來很小，卻不代表有預測力。另外，原文把輸入視窗寫成 X<sub>(t−L):(t+1)</sub>，但展開式只到 X<sub>t</sub>，下標不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p15">
+    <div>
+      <div class="pno"><span class="id">¶15</span>3.2 · 架構總覽<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">The model has three parts. <mark class="m">Relationship-graph generation</mark> uses global and local Pearson, Spearman and FastDTW to form synchronous and asynchronous graphs. <mark class="m">Sequence decomposition</mark> splits each price series with GA-tuned VMD. The <mark class="m">adversarial module</mark> trains a Multi-GCN + GRU generator against a CNN discriminator under WGAN with MSE. <mark class="k">One generator per sub-series</mark>; predictions are summed to recover the price.</p>
+      <hr class="sep">
+      <p class="zh">模型分三部分。關係圖生成：以全局與局部的 Pearson、Spearman、FastDTW，建立同步與非同步的關聯圖。序列分解：以 GA 調參的 VMD 把每條股價序列拆成子序列。生成對抗模組：在 WGAN＋MSE 框架下，以 Multi-GCN＋GRU 生成器對抗 CNN 判別器。每個子序列各自訓練一個生成器，最後把各子序列的預測值相加，還原成股價預測。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>架構地圖</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這段（搭配原文圖一）是閱讀第 3 章的導覽。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">「每個子序列一個生成器、最後相加」是分解類模型的標準作法，概念清楚。</span><span class="flaw">若 K 個子序列各自訓練一組 GAN，實際訓練成本應是 K 倍；表三的訓練時間 74 秒是否已包含所有子模型與 GA 搜尋，文中沒有交代。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p16">
+    <div>
+      <div class="pno"><span class="id">¶16</span>3.3 · 為何選 VMD<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="t">Decomposition breaks a noisy series into sub-series of distinct frequencies and trends, reducing instability</mark>. Among wavelet transform, EMD and VMD, the authors favour <mark class="k">VMD</mark> because it <mark class="c">adapts its regularization to the data and suits non-stationary, noisy, chaotic financial series</mark>; prior work found VMD hybrids more accurate than other decompositions.</p>
+      <hr class="sep">
+      <p class="zh">分解演算法能把雜訊多的序列拆成頻率與趨勢各不相同的子序列，降低不穩定性。在小波轉換、EMD、VMD 之中，作者選擇 VMD，理由是它能依資料調整正則化，較適合非平穩、高雜訊、混沌的金融序列；也有文獻指出以 VMD 為基礎的混合模型比其他分解法更準確。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法選擇的理由</strong></div>
+      <dl><dt>邏輯角色</dt><dd>以文獻與資料特性雙重理由合理化 VMD。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">表四其實顯示 EEMD 在 SSE 資料上的 RMSE、MAE 比本文的 VMD 更好（0.3796／0.3336 對 0.4380／0.3601），「VMD 較優」並非全面成立。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p17">
+    <div>
+      <div class="pno"><span class="id">¶17</span>3.3.1 · VMD 原理<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="k">VMD</mark> (Dragomiretskiy & Zosso, 2013) is non-recursive: it <mark class="m">solves a constrained variational problem to split a signal into K <mark class="k">Intrinsic Mode Functions</mark> with limited bandwidth</mark>, whose sum reconstructs the series. Key settings are the mode count K, penalty α, multiplier τ and tolerance ε. <mark class="e">The decomposed sub-series look smoother and more regular than the raw price</mark>.</p>
+      <hr class="sep">
+      <p class="zh">VMD（Dragomiretskiy & Zosso, 2013）是非遞迴的分解法：透過求解帶約束的變分問題，把訊號拆成 K 個頻寬有限的本質模態函數（IMF），這些子序列相加即可重建原序列。主要參數有模態數 K、懲罰因子 α、乘數 τ 與收斂容許值 ε。分解後的子序列明顯比原始股價平滑、規律。</p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>關鍵概念解說</strong></div>
+      <dl><dt>邏輯角色</dt><dd>提供理解 VMD 的最低限度知識。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「子序列看起來更平滑」是視覺印象（原文圖二），平滑本身不等於可預測。特別是 VMD 對序列尾端的處理會受到「未來」資料影響（見 ¶28）。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p18">
+    <div>
+      <div class="pno"><span class="id">¶18</span>3.3.2 · 用 GA 找 VMD 參數<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">K and α strongly affect decomposition: <mark class="c">too large K over-decomposes, too small leaves instability; too large α loses signal, too small mixes components</mark>. <mark class="m">A Genetic Algorithm searches K ∈ {2,…,10} and α over a range tied to training length, minimizing the mean Pearson correlation between each training series and its VMD residual</mark> (the residual-correlation idea of Jia et al., 2021).</p>
+      <hr class="sep">
+      <p class="zh">K 與 α 對分解結果影響很大：K 太大會過度分解，太小則仍不穩定；α 太大會遺失訊號，太小則各成分互相混雜。作者用基因演算法在 K∈{2,…,10}、α 依訓練集長度設定的範圍內搜尋，目標是讓「訓練序列與 VMD 殘差的平均 Pearson 相關」最小（即 Jia 等人 2021 的殘差相關理論）。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節・貢獻 (2)</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這是第二項貢獻的實體內容。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">只用訓練集計算目標函數，避免了參數選擇時偷看測試資料，這點做得正確。</span><span class="flaw">GA 只有在 K、α 兩個參數上搜尋，而 K 是 9 個整數，窮舉 α 的網格也不難；用 GA「避免局部最佳」的必要性沒有被說明。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p19">
+    <div>
+      <div class="pno"><span class="id">¶19</span>3.4 · 為何用市場訊號建圖<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Treating the market as a graph <mark class="t">makes inter-stock dependencies explicit and more interpretable</mark>. Firms relate through industries, shareholders or supply chains, but <mark class="c">human tagging or NLP is hard to obtain and ambiguous</mark>, whereas <mark class="e">graphs built directly from market signals are easier and have worked in practice</mark>. <mark class="c">Existing signal-based graphs, however, mine only simultaneous correlation and ignore lead–lag effects.</mark></p>
+      <hr class="sep">
+      <p class="zh">把股市視為一張圖，能讓股票之間的依賴關係變得明確、也更容易解釋。公司之間可能有產業、股東、供應鏈等關係，但人工標註或 NLP 方法取得困難、資訊也常模糊；直接從市場訊號建圖較容易實作，實務上也證實有效。不過，現有以市場訊號建圖的研究只挖掘同步相關，忽略了領先—落後效應。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>重申缺口・為設計辯護</strong></div>
+      <dl><dt>邏輯角色</dt><dd>再次對齊 ¶7 的缺口，引出 FastDTW 的必要性。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「圖讓模型更可解釋」只是宣稱：全文沒有展示任何一張學到的圖或權重 w<sub>kn</sub>，可解釋性並沒有實際兌現。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p20">
+    <div>
+      <div class="pno"><span class="id">¶20</span>3.4 · 同步關聯：Pearson 與 Spearman<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">For <mark class="k">synchronous correlation</mark>, two graphs are built: a <mark class="k">Pearson</mark> graph for linear co-movement and a <mark class="k">Spearman rank</mark> graph for monotonic co-movement. <mark class="m">Each relation type yields an undirected graph whose adjacency entry is the correlation between two stocks’ historical prices.</mark></p>
+      <hr class="sep">
+      <p class="zh">針對同步相關，作者建立兩張圖：Pearson 圖衡量線性的共同變動，Spearman 等級相關圖衡量單調的共同變動。每一種關係類型都形成一張無向圖，鄰接矩陣中的元素就是兩檔股票歷史價格之間的相關係數。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節</strong></div>
+      <dl><dt>邏輯角色</dt><dd>6 張圖中的前兩類。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">相關係數是用「價格」計算，不是用「報酬」。兩條有趨勢的價格序列，即使毫無關係也會出現很高的相關（虛假相關）。正確作法通常是用報酬率計算相關；作者用 0.9 的高門檻篩邊，可能大部分保留下來的都是「同方向趨勢」而非真實的連動。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p21">
+    <div>
+      <div class="pno"><span class="id">¶21</span>3.4 · 非同步關聯：FastDTW<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">To capture <mark class="k">lead–lag</mark> relations, a <mark class="k">FastDTW</mark> graph is added. DTW aligns two series by warping time; <mark class="m">FastDTW approximates it in linear time via coarsening, projection and refinement</mark>. <mark class="m">Edge weight = 1 − (FastDTW distance / n)</mark>, scaling results toward [0,1] so they can be combined with the correlation graphs.</p>
+      <hr class="sep">
+      <p class="zh">為了捕捉領先—落後關係，作者加入 FastDTW 圖。DTW 透過扭曲時間軸來對齊兩條序列；FastDTW 以「粗化、投影、細化」三步驟，在線性時間內近似 DTW。邊的權重定義為 1 −（FastDTW 距離 ÷ n），把結果縮放到大致 0～1 之間，以便和相關係數圖合併。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節・回應缺口</strong></div>
+      <dl><dt>邏輯角色</dt><dd>直接回應 ¶7 的「忽略 lead–lag」缺口，是本文在建圖上的主要新意。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">DTW 是對稱的距離，只能說兩條序列「形狀相似（允許錯位）」，無法告訴你誰領先、誰落後，圖也是無向的，所以「捕捉 lead–lag」的說法誇大了。另外，1 − 距離／n 並不保證落在 [0,1]，距離大時會變成負數。原文圖三的標題也誤植為「Time series decomposition results」。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p22">
+    <div>
+      <div class="pno"><span class="id">¶22</span>3.4 · 全局與局部<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Because some inter-stock relations are <mark class="c">unstable and time-varying</mark>, <mark class="m">global graphs (whole training period) are complemented by local graphs: the training set is cut into sliding windows of length T<sub>w</sub>, each correlation is computed per window, and the window average forms the local graph</mark>. This gives six graphs in total.</p>
+      <hr class="sep">
+      <p class="zh">由於部分股票關係並不穩定、會隨時間改變，作者除了以整段訓練期建立全局圖，也建立局部圖：把訓練集切成長度 T<sub>w</sub> 的滑動視窗，在每個視窗內計算相關，再取各視窗平均作為局部圖。全局與局部共 6 張圖。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節</strong></div>
+      <dl><dt>邏輯角色</dt><dd>補上「局部」這個維度，完成 3 種度量 × 2 種範圍 = 6 張圖。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">局部圖取「所有視窗的平均」之後，仍然是一張固定不變的圖，並沒有真正處理「關係隨時間改變」；作者在結論（¶40）也承認這一點。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p23">
+    <div>
+      <div class="pno"><span class="id">¶23</span>3.5 · 生成對抗的概念<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">In the <mark class="k">GAN</mark>, <mark class="m">the generator predicts the next price; prediction + input window forms a fake sample, true price + input window forms a real sample, and the discriminator learns to tell them apart</mark>. The two networks are trained alternately until a <mark class="k">Nash equilibrium</mark>, at which point the generator is claimed to produce realistic, accurate forecasts.</p>
+      <hr class="sep">
+      <p class="zh">在 GAN 中，生成器負責預測下一期股價：把預測值接在輸入視窗後面就是「假樣本」，把真實股價接在後面就是「真樣本」，判別器則學習分辨兩者。兩個網路交替訓練，直到達成納許均衡；作者認為此時生成器就能產生逼真且準確的預測。</p>
+    </div>
+    <aside class="note n-k">
+      <div class="fn"><span class="chip">功能</span><strong>關鍵概念</strong></div>
+      <dl><dt>邏輯角色</dt><dd>說明為什麼要把「預測」包裝成「生成」。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「逼真」和「準確」是兩回事：判別器只要求預測值「看起來像真的股價走勢」，不要求接近真值。所以模型真正能提升準確度的，其實是後面加入的 MSE 項（見 ¶26、¶36）。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p24">
+    <div>
+      <div class="pno"><span class="id">¶24</span>3.5.1 · 生成器：Multi-GCN<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">The six graphs are fused into a synthesis graph whose adjacency is a <mark class="m">weighted sum of the six adjacency matrices with trainable weights</mark>, since the importance of each relation is hard to set by hand. <mark class="m">A first-order GCN layer (normalized adjacency × features × weights, ReLU)</mark> then mixes each stock’s history with its neighbours’, yielding node embeddings that carry cross-stock influence.</p>
+      <hr class="sep">
+      <p class="zh">6 張圖會融合成一張綜合圖：其鄰接矩陣是 6 個鄰接矩陣的加權和，權重可以訓練，因為各種關係的重要性很難人工決定。接著以一階近似的 GCN 層（正規化鄰接矩陣 × 特徵 × 權重，再經 ReLU）把每檔股票的歷史與鄰居的資訊融合，得到帶有跨股影響的節點表示。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節・Multi-GCN</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這是本文和單圖 GCN 方法（如 GCGRU）的主要差異。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">讓資料自己學各張圖的權重，避免人工設定，設計合理。</span><span class="flaw">原文寫權重 w<sub>kn</sub> ∈ ℝ<sup>n×n</sup>，代表每一條邊都有自己的可訓練參數；以 SSE／DJIA 只有 500 多個訓練日來說，參數量偏大，容易過擬合。文中也沒有報告學到的權重，無法得知哪一種圖真正有用。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p25">
+    <div>
+      <div class="pno"><span class="id">¶25</span>3.5.1 · 生成器：GRU ／ 3.5.2 判別器<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="k">GRU</mark> cells (reset and update gates) then model temporal dependence over the node embeddings. The <mark class="k">discriminator</mark> is a <mark class="m">CNN that takes the L-day input plus either the true or predicted next value and outputs a “fakeness” score</mark>; its gradient is back-propagated to the generator.</p>
+      <hr class="sep">
+      <p class="zh">得到節點表示後，再用 GRU（重置閘與更新閘）建立時間上的依賴關係。判別器是一個 CNN：輸入 L 天的資料，再接上真實或預測的下一期數值，輸出一個「多假」的分數；判別器的梯度會反向傳遞給生成器。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>方法細節</strong></div>
+      <dl><dt>邏輯角色</dt><dd>完成生成器與判別器的結構描述。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">判別器只看「單一檔股票的 L+1 個點」，看不到其他股票，也就無法懲罰「跨股關係不合理」的預測，和本文強調的「股票關聯」沒有連結。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p26">
+    <div>
+      <div class="pno"><span class="id">¶26</span>3.5.3 · WGAN-GP ＋ MSE<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">GANs suffer from <mark class="c">unstable training and mode collapse</mark>; <mark class="k">WGAN-GP</mark> replaces weight clipping with a gradient penalty (λ = 10) for stability. Following a traffic-forecasting study, <mark class="t">the generator loss adds a weighted MSE term (factor k) to the adversarial loss, combining supervised and adversarial training</mark> for accuracy and stability.</p>
+      <hr class="sep">
+      <p class="zh">GAN 常有訓練不穩定與模式崩潰的問題；WGAN-GP 以梯度懲罰（λ = 10）取代權重裁剪，讓訓練更穩定。作者參考一篇交通流量預測的研究，在生成器的損失中加入權重為 k 的 MSE 項，與對抗損失合併，結合監督式與對抗式訓練，以兼顧準確度與穩定性。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>關鍵設計</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把 GAN 從「生成逼真資料」轉成「輔助預測」的關鍵一步。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">引用他領域（交通流量）的成功經驗，並說明自己改進了什麼（加上 WGAN-GP 處理不穩定）。</span><span class="flaw">原文的「MSE 損失」公式其實帶有根號，是 RMSE。真正讓預測接近真值的是 MSE 項；表八顯示 k=0（只做對抗訓練）效果最差，這反而說明對抗損失本身的貢獻有限。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s4">
+  <div class="sec-h"><span class="num">4</span><h2>實驗設計</h2><span class="en">Experiments</span></div>
+  <p class="sec-sum">資料、前處理、參數、指標與比較對象。這一章決定了第 5 章的數字能不能被信任。</p>
+
+  <article class="row" id="p27">
+    <div>
+      <div class="pno"><span class="id">¶27</span>4.1 · 三個資料集<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">(a) ETF: daily price averages of the top 50 ETFs, 22 Nov 2010 – 4 Jun 2020 (Kibot, subscription); (b) SSE 50 constituents, 2 Jan 2018 – 31 Dec 2020 (Tushare); (c) DJIA constituents, same period (Yahoo Finance).</mark> <mark class="m">Only daily closing prices are used; stocks with missing values or outliers are dropped; data are split 7:1:2 into train, validation and test.</mark></p>
+      <hr class="sep">
+      <p class="zh">(a) ETF：前 50 大 ETF 的每日價格平均，2010/11/22～2020/6/4（Kibot，需付費訂閱）；(b) SSE：上證 50 成分股，2018/1/2～2020/12/31（Tushare）；(c) DJIA：道瓊成分股，同一期間（Yahoo Finance）。實驗只使用每日收盤價；有缺值或離群值的股票會被剔除；資料依 7:1:2 切成訓練、驗證、測試集。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>資料基礎</strong></div>
+      <dl><dt>邏輯角色</dt><dd>橫跨美、中兩個市場與 ETF，看起來具備一定的外部效度。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">表一列出 ETF 共 2,854 個交易日，但 2010/11 到 2020/6 大約只有 2,400 個交易日，數字對不上。SSE、DJIA 的測試集只有 146、151 天（約 2020 年下半年，正值疫情後的大反彈），單一市場階段的結果很難推廣。「剔除離群值股票」也可能造成倖存者偏誤。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p28">
+    <div>
+      <div class="pno"><span class="id">¶28</span>4.2.1 · 前處理與資料洩漏<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="m">Min–Max scaling to [0,1]</mark> is applied, described as reducing noise. The authors note that <mark class="c">decomposing or normalizing train and test together leaks information</mark>; instead <mark class="m">they fit decomposition and normalization on the training set and apply the same parameters to the test set</mark>, then de-normalize outputs before computing metrics.</p>
+      <hr class="sep">
+      <p class="zh">資料經過 Min–Max 正規化到 [0,1]，作者說這是為了降低雜訊。作者指出，若把訓練集與測試集合在一起分解或正規化，會造成資料洩漏；因此他們先在訓練集上分解與正規化，再用同一組參數處理測試集，最後把輸出反正規化後才計算指標。</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>預先回應洩漏質疑</strong></div>
+      <dl><dt>邏輯角色</dt><dd>主動處理「分解造成資料洩漏」這個審稿人一定會問的問題。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">主動提出洩漏風險並說明對策，是好的研究習慣。</span><span class="flaw">⚠ 只解決了一半：正規化用訓練集參數是對的，但 VMD 是非因果（non-causal）的演算法，對「整段測試序列」做分解時，第 t 天的子序列值會受到 t 之後資料的影響。「用相同參數」並不能消除這種前視偏誤；要像 ¶12 的 Liu 等人那樣逐窗分解才行。另外，Min–Max 正規化只改變尺度，並不會降低雜訊。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p29">
+    <div>
+      <div class="pno"><span class="id">¶29</span>4.2.2 · 參數設定<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="m">After several trials: RMSprop, learning rate 0.008, 100 epochs, batch 128, input window L = 15, local window T<sub>w</sub> = 30, graph threshold ε = 0.9 (edge kept if weight &gt; 0.9), MSE factor k = 3; VMD τ = 0, tolerance 1e-7, K and α by GA; graph weights initialized uniformly.</mark></p>
+      <hr class="sep">
+      <p class="zh">經過數次試驗後設定：RMSprop 優化器、學習率 0.008、100 個 epoch、批次大小 128、輸入視窗 L = 15、局部視窗 T<sub>w</sub> = 30、建圖門檻 ε = 0.9（權重大於 0.9 才連邊）、MSE 權重 k = 3；VMD 的 τ = 0、收斂容許值 1e-7，K 與 α 由 GA 決定；各關係圖的權重初始為均等。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>實驗設定</strong></div>
+      <dl><dt>邏輯角色</dt><dd>提供重現所需的超參數。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「after several trials」沒有說是用驗證集還是測試集調參。學習率在這裡寫 0.008，5.1 節卻寫 8e-4，兩處不一致；ε 這個符號也同時被用在建圖門檻和 VMD 收斂容許值上。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p30">
+    <div>
+      <div class="pno"><span class="id">¶30</span>4.2.3 · 評估指標<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="m">Accuracy is the share of predictions whose up/down direction is correct</mark>; <mark class="m">RMSE, MAE and MAPE</mark> measure price errors. Higher accuracy and lower errors indicate better prediction.</p>
+      <hr class="sep">
+      <p class="zh">準確率（Accuracy）是預測漲跌方向正確的比例；RMSE、MAE、MAPE 則衡量價格誤差。準確率越高、誤差越小，代表預測效果越好。</p>
+    </div>
+    <aside class="note n-m">
+      <div class="fn"><span class="chip">功能</span><strong>評估方法</strong></div>
+      <dl><dt>邏輯角色</dt><dd>同時看方向與誤差，比只看 RMSE 更完整。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">加入方向準確率很重要，因為交易決策主要依賴方向。</span><span class="flaw">沒有說明「方向」是相對於前一天實際價格，還是前一天的預測值。在價格水準預測中，這兩種定義可能得出差很多的結果。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p31">
+    <div>
+      <div class="pno"><span class="id">¶31</span>4.3 · 比較基準<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Baselines: <mark class="e">GRU, GCGRU (Pearson graph + GRU), SCINet, StemGNN, PF-LSTM, DLinear, FEDformer, N-HiTS, WaveForM and PatchTST</mark> — recurrent, graph-based, decomposition-based and Transformer-based models.</p>
+      <hr class="sep">
+      <p class="zh">比較基準包括 GRU、GCGRU（Pearson 圖＋GRU）、SCINet、StemGNN、PF-LSTM、DLinear、FEDformer、N-HiTS、WaveForM、PatchTST，涵蓋遞迴、圖、分解與 Transformer 等類型。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>對照組</strong></div>
+      <dl><dt>邏輯角色</dt><dd>10 個基準，範圍很廣，看起來比較充分。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">缺少兩個最關鍵的基準：(1) 隨機漫步／前一日價格（naive persistence），這是預測價格水準時必須打敗的最低門檻；(2) 最接近的多圖方法（Multi-GCGRU、THGNN）。另外，各基準的訓練預算不同（DLinear 10 個 epoch、N-HiTS 50 個、其他 100 個），比較並不公平。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s5">
+  <div class="sec-h"><span class="num">5</span><h2>結果與討論</h2><span class="en">Results and Discussion</span></div>
+  <p class="sec-sum">主比較（表二、三）→ VMD 參數最佳化（表四、五）→ 關係圖消融（表六）→ 模組消融（表七）→ 超參數 k 與 T<sub>w</sub>（表八至十）。</p>
+
+  <article class="row" id="p32">
+    <div>
+      <div class="pno"><span class="id">¶32</span>5.1 · 主要比較（表二、表三）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">VGC-GAN achieves the best Accuracy, RMSE and MAE on all three datasets; its ETF MAPE is slightly above the best</mark>. <mark class="e">GRU, GCGRU, DLinear, N-HiTS, PatchTST and VGC-GAN are computationally efficient; PF-LSTM, SCINet, StemGNN, FEDformer and WaveForM are slow.</mark> <mark class="t">The authors conclude the model is superior and robust.</mark></p>
+      <hr class="sep">
+      <p class="zh">VGC-GAN 在三個資料集上的準確率、RMSE、MAE 都是最佳；只有 ETF 的 MAPE 略高於最佳值。運算效率方面，GRU、GCGRU、DLinear、N-HiTS、PatchTST 與 VGC-GAN 較快，PF-LSTM、SCINet、StemGNN、FEDformer、WaveForM 較慢。作者據此認為模型具有優越性與穩健性。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表二 準確率（ETF／SSE／DJIA）：VGC-GAN 0.5285／0.5673／0.5712｜PF-LSTM 0.5206／0.5646／0.5323｜DLinear 0.4879／0.4910／0.4938<br>MAPE：VGC-GAN 5.865%／2.415%／2.285%｜PF-LSTM 5.749%／4.981%／5.342%｜GCGRU 21.889%／14.571%／52.792%<br>表三 訓練時間：VGC-GAN 74.46 秒｜GRU 58.04｜DLinear 1.11｜WaveForM 2495.33</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>主要證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>全文最核心的實證：直接兌現貢獻 (3)。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">同時報告效能與成本（參數量、訓練與測試時間），比只報準確度更完整。</span><span class="flaw">方向準確率 0.53～0.57，只比丟銅板好一點；而且 2020 下半年美股大多上漲，「永遠預測上漲」可能就有類似的準確率，論文沒有報告這個基準。許多基準的準確率甚至低於 0.5，DJIA 上 GCGRU 的 MAPE 高達 52.8%，代表這些基準可能沒有調好，比較的說服力打折。全部只跑一次，沒有標準差或顯著性檢定。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p33">
+    <div>
+      <div class="pno"><span class="id">¶33</span>5.1 · 預測曲線圖<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">Figures 6–8 plot predicted versus actual prices for one stock in each dataset</mark>; <mark class="t">the authors note that VGC-GAN’s prediction line closely follows the actual price</mark>.</p>
+      <hr class="sep">
+      <p class="zh">圖六至圖八分別畫出三個資料集中各一檔股票的預測值與實際值，作者指出 VGC-GAN 的預測曲線與實際價格非常貼近。</p>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>視覺證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>以圖像補強表二的數字。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">「預測曲線貼著實際曲線」是價格預測中最常見的錯覺：只要把昨天的價格當成今天的預測，曲線一樣會緊貼，只是往右平移一天。沒有隨機漫步基準，這些圖無法證明模型有預測力。每個資料集也只挑了一檔股票展示。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p34">
+    <div>
+      <div class="pno"><span class="id">¶34</span>5.2.1 · VMD 參數最佳化（表四、表五）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en">Comparing exhaustive search (α fixed at 2000) with GA over three objectives, plus other decompositions (EMD, EEMD, CEEMDAN, SSA): <mark class="e">GA with residual correlation gives the best overall results on all three datasets</mark>; <mark class="e">GA reaches lower objective values than exhaustive search</mark>. <mark class="c">Other GA objectives are sometimes worse than exhaustive search, and EEMD beats VMD on SSE RMSE/MAE</mark>, though VMD is judged more robust.</p>
+      <hr class="sep">
+      <p class="zh">作者比較窮舉法（α 固定 2000）與 GA 在三種目標函數下的效果，並加入 EMD、EEMD、CEEMDAN、SSA 等其他分解法。結果顯示：GA 搭配殘差相關在三個資料集上整體最佳；GA 找到的目標函數值比窮舉法更低。但其他目標函數的 GA 有時反而不如窮舉法，EEMD 在 SSE 的 RMSE、MAE 也優於 VMD；作者認為 VMD 整體較穩健。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表四 SSE：GA-Pearson（本文）RMSE 0.4380、MAE 0.3601｜EEMD RMSE 0.3796、MAE 0.3336｜EMD 準確率 0.5448</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>證據＋讓步</strong></div>
+      <dl><dt>邏輯角色</dt><dd>兌現貢獻 (2)，並誠實揭露反例。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">主動報告「GA 不一定贏」與「EEMD 某些指標較好」，可信度加分。</span><span class="flaw">表四中「Envelope entropy*」與「Residual*」兩列在 ETF 上的數字完全相同（0.5161／8.7087／7.8157／8.669%），可能是選到了相同的 K，也可能是誤植，文中沒有解釋。「GA-Pearson」那一列和表二的 VGC-GAN 完全一樣，但文字說最佳的是「GA＋殘差相關」，命名前後不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p35">
+    <div>
+      <div class="pno"><span class="id">¶35</span>5.2.2 · 關係圖消融（表六）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">Combining global and local graphs performs best, followed by the Global model (P + SP + DTW), both beating any single graph.</mark> <mark class="e">Pearson and Spearman alone are comparable; DTW alone is worst</mark>, <mark class="c">but adding DTW to P &amp; SP helps</mark> — <mark class="t">so DTW is not useful alone but supplements other graphs</mark>.</p>
+      <hr class="sep">
+      <p class="zh">結合全局與局部圖的模型表現最好，其次是全局模型（P＋SP＋DTW），兩者都優於只用單一張圖。單獨使用時，Pearson 與 Spearman 表現相近，DTW 最差；但把 DTW 加入 P＆SP 後有幫助。作者據此認為 DTW 不適合單獨使用，但能補充其他圖的資訊。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表六 DJIA 準確率：Pearson 0.5327｜Spearman 0.5520｜DTW 0.4972｜P&amp;SP 0.5538｜Global 0.5612｜Global&amp;Local 0.5712</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>機制證據（多圖的價值）</strong></div>
+      <dl><dt>邏輯角色</dt><dd>支撐「多角度建圖」這個核心論點。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">在三個資料集上趨勢一致，是全文較有說服力的證據之一。</span><span class="flaw">DTW 單獨使用時最差，卻主張它「捕捉了 lead–lag」，兩者有落差。改善也可能只是因為參數變多（更多可訓練的圖權重），缺少「加入一張隨機圖」的對照組。另外，此小節標題誤植為「Impact of the VMD parameters optimization methods」。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p36">
+    <div>
+      <div class="pno"><span class="id">¶36</span>5.2.3 · 模組消融（表七）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">Removing decomposition (VGC-GAN1), Multi-GCN (VGC-GAN2) or the adversarial framework (VGC-GAN3) all worsen results</mark>; <mark class="t">each module is said to contribute significantly, and all three are needed together</mark>.</p>
+      <hr class="sep">
+      <p class="zh">拿掉序列分解（VGC-GAN1）、Multi-GCN（VGC-GAN2）或生成對抗框架（VGC-GAN3），表現都會變差。作者認為每個模組都有顯著貢獻，三者缺一不可。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表七 準確率（ETF／SSE／DJIA）：完整模型 0.5285／0.5673／0.5712｜無分解 0.4941／0.5232／0.5063｜無 Multi-GCN 0.5118／0.5248／0.5162｜無 GAN 0.5278／0.5669／0.5664</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>消融證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>這是驗證「三組件缺一不可」的關鍵實驗。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">消融實驗設計完整，三個組件都有拆掉的版本。</span><span class="flaw">仔細看數字：拿掉 GAN（VGC-GAN3）後，準確率幾乎沒變（0.5278 對 0.5285、0.5669 對 0.5673、0.5664 對 0.5712），變差的主要是 RMSE。也就是說 GAN 對「方向」幾乎沒有貢獻。「顯著」也沒有任何統計檢定支持。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p37">
+    <div>
+      <div class="pno"><span class="id">¶37</span>5.3.1 · MSE 權重 k（表八）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">k = 3 gives the best average results, followed by k = 5</mark>; <mark class="c">the relation between k and performance is complex, so k = 3 is taken as an (at least local) optimum</mark>. <mark class="e">k = 0 (adversarial training only) is worst on every dataset</mark>, <mark class="t">showing that adding MSE to WGAN helps and that supervised plus adversarial training improves prediction</mark>.</p>
+      <hr class="sep">
+      <p class="zh">k = 3 的平均表現最好，其次是 k = 5；作者認為 k 與表現的關係很複雜，因此把 k = 3 視為（至少是局部的）最佳值。k = 0（只做對抗訓練）在所有資料集上都最差，作者據此主張：在 WGAN 中加入 MSE 有幫助，監督式與對抗式訓練結合能提升預測。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表八 平均最佳：k = 3｜k = 0 時 MAPE（ETF／SSE／DJIA）9.061%／2.859%／2.583%｜k = 1 時 DJIA MAPE 2.281%（低於 k = 3 的 2.285%）</div>
+    </div>
+    <aside class="note n-e">
+      <div class="fn"><span class="chip">功能</span><strong>超參數證據</strong></div>
+      <dl><dt>邏輯角色</dt><dd>支撐 WGAN＋MSE 這個設計選擇。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">k = 0 最差，說明的其實是「監督式損失不可或缺」，而不是「對抗損失有幫助」；要證明後者，應該比較「只有 MSE（無判別器）」，也就是表七的 VGC-GAN3，而它和完整模型幾乎一樣。更重要的是，k 看起來是直接依測試集表現挑選的，等於用測試集調參。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p38">
+    <div>
+      <div class="pno"><span class="id">¶38</span>5.3.2 · 局部視窗 T<sub>w</sub>（表九、表十）<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="e">T<sub>w</sub> = 30 gives the most robust average performance, but is not best on every dataset</mark>. <mark class="m">An average-volatility measure is introduced</mark>: <mark class="t">low-volatility data favour longer windows, higher-volatility data favour shorter ones</mark>. <mark class="c">T<sub>w</sub> of 15 and 30 generally beat 7 and 45, suggesting a local optimum in between; 30 is tentatively adopted.</mark></p>
+      <hr class="sep">
+      <p class="zh">T<sub>w</sub> = 30 的平均表現最穩健，但並非在每個資料集上都最好。作者引入「平均波動度」來解釋：波動低的資料適合較長的視窗，波動高的資料適合較短的視窗。T<sub>w</sub> 為 15 與 30 時，整體優於 7 與 45，顯示局部最佳可能在兩者之間；作者暫定採用 30。</p>
+      <div class="tbl"><span class="tbl-lbl">表格數據（取自原文）</span>表十 SSE：T<sub>w</sub> = 30 時 RMSE 0.4380、MAPE 2.415%｜T<sub>w</sub> = 45 時 RMSE 0.3820、MAPE 2.073%<br>表九 DJIA 邊數（T<sub>w</sub> = 30）：Pearson 12、Spearman 12、FastDTW 4</div>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>超參數＋事後解釋</strong></div>
+      <dl><dt>邏輯角色</dt><dd>把「最佳值因資料而異」轉化為一個可解釋的規律（波動度）。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">嘗試用資料特性解釋超參數差異，比單純報最佳值更有洞見。</span><span class="flaw">只有三個資料集，用來支撐「波動度 ↔ 視窗長度」的規律，樣本太少。而且表十顯示 SSE 在 T<sub>w</sub> = 45 時的 RMSE、MAE、MAPE 都比採用的 30 更好，代表表二呈現的並非每個資料集的最佳結果；超參數同樣是看測試集挑的。表九顯示 DJIA 在 T<sub>w</sub> = 30 時，局部 FastDTW 圖只剩 4 條邊，圖幾乎是空的。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="sec" id="s6">
+  <div class="sec-h"><span class="num">6</span><h2>結論</h2><span class="en">Conclusion</span></div>
+  <p class="sec-sum">重述架構，並承認「關係是靜態的」這個主要限制。</p>
+
+  <article class="row" id="p39">
+    <div>
+      <div class="pno"><span class="id">¶39</span>6 · 總結<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="t">VGC-GAN predicts stock prices using several correlation graphs built from historical data, VMD denoising with GA and residual-correlation tuning, and a WGAN with MSE whose Multi-GCN + GRU generator and CNN discriminator are trained adversarially and in a supervised way</mark>, which the authors say improves training and predictive performance.</p>
+      <hr class="sep">
+      <p class="zh">VGC-GAN 以歷史資料建立多張相關性圖，用 VMD 降噪（參數由 GA 與殘差相關理論決定），再以加入 MSE 的 WGAN 進行訓練：生成器為 Multi-GCN＋GRU，判別器為 CNN，透過對抗與監督式訓練改善生成器，進而提升預測表現。</p>
+    </div>
+    <aside class="note n-t">
+      <div class="fn"><span class="chip">功能</span><strong>總結論點</strong></div>
+      <dl><dt>邏輯角色</dt><dd>回扣摘要，首尾呼應。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="flaw">結論把多張圖描述成依「相似度、相關性與空間距離」建立，但本文從未使用「空間距離」，與第 3 章的內容不一致。</span></dd></dl>
+    </aside>
+  </article>
+
+  <article class="row" id="p40">
+    <div>
+      <div class="pno"><span class="id">¶40</span>6 · 限制與未來方向<span class="src-tag">英文重述・非原文</span></div>
+      <p class="en"><mark class="c">The model combines synchronous and asynchronous relations but cannot handle dynamic changes in stock relationships, which can add noise and hurt performance.</mark> <mark class="t">Future work will explore <mark class="k">dynamic graph convolution</mark></mark> and apply the model to other domains such as wind power and traffic-flow prediction.</p>
+      <hr class="sep">
+      <p class="zh">本模型結合了同步與非同步關係，但無法處理股票關係的動態變化，而這種變化可能帶來雜訊、影響表現。未來研究將探討動態圖卷積，並把模型應用到風力發電、交通流量等其他領域的預測。</p>
+    </div>
+    <aside class="note n-c">
+      <div class="fn"><span class="chip">功能</span><strong>承認限制</strong></div>
+      <dl><dt>邏輯角色</dt><dd>主動指出「靜態圖」的限制，與 ¶22 的批評一致。</dd>
+      <dt>技巧／漏洞</dt><dd><span class="tech">坦承限制並提出具體的改進方向（動態圖），是負責任的寫法。</span><span class="flaw">限制只談了模型結構，沒有提到評估上的限制：單一測試期、沒有隨機漫步基準、沒有交易成本與回測、測試集參與超參數選擇。這些對「能不能實際用來交易」的影響更大。</span></dd></dl>
+    </aside>
+  </article>
+
+</section>
+
+<section class="map" id="map">
+  <h2>論證結構總覽</h2>
+  <p class="sub">全文邏輯骨架：問題 → 論點 → 證據 → 反駁 → 結論（點選段號可跳回原段）</p>
+  <div class="chain">
+    <div class="step" style="--sb:var(--r-b)">
+      <h3>問題<small>PROBLEM</small></h3>
+      <ul>
+        <li>多數模型把股票當成<b>獨立個體</b> <a href="#p6">¶6</a></li>
+        <li>圖方法依賴<b>預設關係圖</b>，需要額外資料 <a href="#p7">¶7</a></li>
+        <li>價格相關圖只看<b>同步、全局</b>相關，忽略 lead–lag <a href="#p19">¶19</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--y-b)">
+      <h3>論點<small>THESIS</small></h3>
+      <ul>
+        <li>只用歷史價格建 <b>6 張圖</b>（3 種度量 × 全局／局部） <a href="#p22">¶22</a></li>
+        <li><b>VMD＋GA</b> 分解降噪 <a href="#p18">¶18</a></li>
+        <li><b>WGAN-GP＋MSE</b> 結合對抗與監督訓練 <a href="#p26">¶26</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--b-b)">
+      <h3>證據<small>EVIDENCE</small></h3>
+      <ul>
+        <li>三資料集準確率、RMSE、MAE 皆最佳 <a href="#p32">¶32</a></li>
+        <li>多圖優於單圖，全局＋局部最佳 <a href="#p35">¶35</a></li>
+        <li>拆掉任一模組表現下降 <a href="#p36">¶36</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--g-b)">
+      <h3>反駁處理<small>REBUTTAL</small></h3>
+      <ul>
+        <li>預先處理資料洩漏：參數只用訓練集估計 <a href="#p28">¶28</a></li>
+        <li>承認 EEMD 在 SSE 部分指標較好 <a href="#p34">¶34</a></li>
+        <li>DTW 單獨無效，但可作補充 <a href="#p35">¶35</a></li>
+      </ul>
+    </div>
+    <div class="step" style="--sb:var(--navy)">
+      <h3>結論<small>CONCLUSION</small></h3>
+      <ul>
+        <li>多圖＋VMD＋WGAN 能提升股價預測 <a href="#p39">¶39</a></li>
+        <li>限制：關係圖是靜態的，未來改用動態圖 <a href="#p40">¶40</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="oneline"><span>作者核心主張 · 一句話版本</span>不必蒐集額外的財務資料，只用歷史股價建立同步與非同步的多張關聯圖，再結合 VMD 降噪和「對抗＋監督」訓練，就能比現有模型更準確地預測隔日股價。</div>
+
+  <div class="vs">
+    <div class="strong">
+      <h4>✦ 論證最強處</h4>
+      <b>消融實驗設計完整，而且三個資料集方向一致。</b>表六逐步把單圖 → 雙圖 → 全局 → 全局＋局部疊上去，表七再分別拆掉分解、Multi-GCN、GAN 三個模組，每一步的變化在 ETF、SSE、DJIA 上方向都相同。這讓「多角度建圖有用」「序列分解有用」的主張，比只看主比較表可信得多。<a href="#p35" style="font-size:12px">→ ¶35</a> <a href="#p36" style="font-size:12px">→ ¶36</a>
+    </div>
+    <div class="weak">
+      <h4>✦ 論證最弱處</h4>
+      <b>沒有和「明天價格＝今天價格」的隨機漫步基準比較，評估流程也有洩漏風險。</b>方向準確率只有 0.53～0.57，預測曲線「緊貼實際值」也是隨機漫步就能做到的效果。此外，VMD 對整段測試序列分解屬於非因果處理（¶28），k 與 T<sub>w</sub> 又是看測試集結果挑選的（¶37、¶38），各基準的訓練預算也不一致。這些都讓「全面優於現有方法」的結論難以成立。<a href="#p32" style="font-size:12px">→ ¶32</a> <a href="#p28" style="font-size:12px">→ ¶28</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  原典：Ma, D., Yuan, D., Huang, M., &amp; Dong, L. (2024). VGC-GAN: A multi-graph convolution adversarial network for stock price prediction. <i>Expert Systems with Applications</i>, 236, 121204. © 2023 Elsevier Ltd.<br>
+  本頁為研讀用批注：左欄英文為重述而非原文，表格數字摘自原文；引用請以原論文為準。
+</footer>
+
+<script>
+// 圖例：切換各維度高亮
+document.querySelectorAll('.legend button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+    document.body.classList.toggle('off-' + btn.dataset.k, on);
+  });
+});
+// 章節導航：目前位置高亮
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.secnav a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var secs = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) {
+        links.forEach(function(l){ l.classList.remove('on'); });
+        var a = map[e.target.id];
+        if (a) {
+          a.classList.add('on');
+          // 只橫向捲動導航列本身，不用 scrollIntoView（sticky 元素會把整頁拉回頂端）
+          var bar = a.parentNode;
+          bar.scrollLeft = a.offsetLeft - (bar.clientWidth - a.offsetWidth) / 2;
+        }
+      }
+    });
+  }, {rootMargin:'-70px 0px -70% 0px'});
+  secs.forEach(function(s){ io.observe(s); });
+})();
+</script>
+</body>
+</html>
