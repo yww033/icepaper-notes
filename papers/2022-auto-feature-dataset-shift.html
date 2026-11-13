@@ -136,6 +136,53 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
   p.en{font-size:16px}
 }
 @media print{.secnav{position:static}.legend button{border-color:#999}}
+
+/* ===== 3-Pass 讀法教學 ===== */
+.guide{margin:30px 0 8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 28px}
+.guide h2{font-family:var(--zh);font-size:23px;margin:0 0 4px}
+.guide .g-sub{color:var(--muted);font-size:14px;line-height:1.75;margin:0 0 18px}
+.guide h3.g-h{display:flex;align-items:center;gap:10px;font-family:"Noto Sans TC",var(--ui);font-size:17px;margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.guide h3.g-h span{font:600 11px var(--ui);letter-spacing:.1em;color:#fff;background:var(--navy);border-radius:4px;padding:3px 8px}
+.passes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pass{border:1px solid var(--line);border-top:5px solid var(--pc);border-radius:9px;background:#fff;padding:16px 16px 12px;font-size:14px;line-height:1.75}
+.pass .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.pass .ph b{font-size:16px;font-family:"Noto Sans TC",var(--ui)}
+.pass .ph small{font:500 12px var(--ui);color:var(--muted);white-space:nowrap}
+.pass .goal{background:var(--paper);border-radius:6px;padding:8px 10px;margin:6px 0 10px;font-size:13.5px}
+.pass h4{font:600 12px var(--ui);letter-spacing:.06em;color:var(--muted);margin:12px 0 4px}
+.chk{list-style:none;margin:0;padding:0}
+.chk li{display:flex;gap:8px;align-items:flex-start;margin:5px 0}
+.chk input{margin-top:5px;flex:none;accent-color:var(--navy)}
+.chk label{cursor:pointer}
+.chk li.done label{color:var(--muted);text-decoration:line-through}
+.pass a, .gnote a, .prof a{color:var(--navy);text-decoration:none;border-bottom:1px dotted var(--navy)}
+details.ans{margin:6px 0;border:1px solid var(--line);border-radius:6px;background:#fffdf8}
+details.ans summary{cursor:pointer;padding:6px 10px;font-weight:500;font-size:13.5px}
+details.ans div{padding:2px 12px 10px;font-size:13.5px;color:#4a463c}
+.fivec{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+.fivec th,.fivec td{border-top:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.65}
+.fivec th{white-space:nowrap;color:var(--navy);width:1%}
+.gnotes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.gnote{border-left:4px solid var(--nb);background:var(--nbg);border-radius:0 8px 8px 0;padding:12px 15px;font-size:14px;line-height:1.75}
+.gnote b.t{display:block;font-size:15px;margin-bottom:4px}
+.gnote ul{margin:4px 0 0;padding-left:18px}
+.gnote.wide{grid-column:1/-1}
+.ev{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;background:#fff}
+.ev th,.ev td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.6}
+.ev th{background:#f3efe4;font-weight:600}
+.ev td.blank{color:#b3ab98}
+.prof{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px;font-size:14px;line-height:1.75}
+.prof .box{background:#fff;border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+.prof h4{margin:0 0 6px;font-size:15px}
+.prof ol,.prof ul{margin:4px 0 0;padding-left:20px}
+.prof li{margin:4px 0}
+.qa{border-top:1px dashed var(--line);padding:9px 0}
+.qa:first-of-type{border-top:0}
+.qa .q{font-weight:600}
+.qa .why{color:#255d2f;font-size:13.5px}
+.qa .say{background:var(--paper);border-radius:6px;padding:6px 10px;margin-top:4px;font-size:13.5px}
+.mail{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:12px 14px;font:13.5px/1.75 var(--ui);margin-top:6px}
+@media (max-width:900px){.passes,.gnotes,.prof{grid-template-columns:1fr}.guide{padding:20px 16px}}
 </style>
 </head>
 <body>
@@ -161,6 +208,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
 
 <nav class="secnav" aria-label="章節導航">
   <div class="wrap">
+    <a href="#guide">3-Pass 讀法</a>
     <a href="#abs">摘要</a>
     <a href="#s1">壹 緒論</a>
     <a href="#s2">貳 文獻回顧</a>
@@ -186,6 +234,70 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
     <li><b>批注卡片顏色</b>對應該段的主要論證功能（黃＝論點、紅＝概念、藍＝證據、綠＝讓步／反駁、紫＝方法）。批注中 <span class="flaw" style="color:#8a2f20">紅字</span> 是潛在漏洞，<span style="color:#255d2f">綠字</span> 是值得學習的論證技巧。</li>
   </ul>
 </div>
+
+
+<section class="guide sec" id="guide">
+  <h2>3-Pass 讀法教學：這篇怎麼讀</h2>
+  <p class="g-sub">三輪讀法出自 S. Keshav〈How to Read a Paper〉：同一篇論文分三次讀，每一輪的目的不同，一輪比一輪深入。下面依照<b>這篇論文的頁碼、章節和表格</b>寫成具體步驟；勾選框會記在你這台電腦的瀏覽器裡，方便追蹤進度。下方批注的 ¶ 段號可以直接點擊跳轉。</p>
+
+  <h3 class="g-h"><span>STEP 1</span>三階段怎麼讀</h3>
+  <div class="passes"><div class="pass" style="--pc:var(--b-b)">
+      <div class="ph"><b>第一輪 · 鳥瞰</b><small>約 15 分鐘</small></div>
+      <div class="goal"><b>目標：</b>知道這篇在做什麼、結論是什麼、值不值得花兩小時細讀。</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="t1-1"><label for="t1-1">讀封面與<b>中文摘要</b>（PDF 第 i 頁），用一句話寫下研究問題。</label></li><li><input type="checkbox" id="t1-2"><label for="t1-2">看<b>目錄、圖目錄、表目錄</b>（第 iii～v 頁）：注意「伍、實驗結果」佔了第 17～56 頁、共 35 張表，代表這是一本以實驗為主的論文。</label></li><li><input type="checkbox" id="t1-3"><label for="t1-3">讀<b>緒論最後一段</b>（第 2 頁）：作者在這裡預告了三個案例的結果，見 <a href="#p8">¶8</a>。</label></li><li><input type="checkbox" id="t1-4"><label for="t1-4">直接跳到<b>陸、結論</b>（第 57 頁），三段各對應一條主線：特徵工程、資料集偏移、DFS。</label></li><li><input type="checkbox" id="t1-5"><label for="t1-5">掃過<b>參考文獻</b>：只有 12 篇，其中 2 篇是同校的碩士論文，代表這篇是延續前作。</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">所有表格的數字、Domingos 偏差—變異的推導（第 13 頁）、附錄三 Khan 的權重公式。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>這篇想解決什麼問題？</summary><div>財金機器學習模型在測試期表現變差（資料集偏移），以及人工特徵不夠完整（欠擬合）。</div></details><details class="ans"><summary>作者用了哪三個工具？</summary><div>KS 檢定挑出分佈前後不一的特徵剔除；判別式學習量化偏移程度；深度特徵合成（DFS）自動生成特徵。</div></details><details class="ans"><summary>三個案例的結論一樣嗎？</summary><div>不一樣：洗錢與配對交易支持 KS 有效；保險資料一開始無效，作者歸因於 2020 年 7 月的金管會法規。這個「不一致」就是第二輪要追的重點。</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">一句話摘要、5C 判斷（下方可展開）、一張「我還不懂的名詞」清單。</p>
+    </div><div class="pass" style="--pc:var(--p-b)">
+      <div class="ph"><b>第二輪 · 抓內容</b><small>約 1.5～2 小時</small></div>
+      <div class="goal"><b>目標：</b>抓出論證主線：每個主張靠哪一張表支撐、數字是多少、作者怎麼解釋。</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="t2-1"><label for="t2-1">先讀<b>肆、研究方法的六個方向</b>（第 10～11 頁，<a href="#p20">¶20</a>），把它當成第伍章的目錄。</label></li><li><input type="checkbox" id="t2-2"><label for="t2-2">畫一條<b>資料時間軸</b>：訓練 2018/9～2020/4、測試 2020/5～9、法規 2020/7；另一個切法是避開法規期（<a href="#p43">¶43</a>）。</label></li><li><input type="checkbox" id="t2-3"><label for="t2-3">依序讀保險實驗的表格，每張只記「改了什麼 → 測試 F1 多少 → 作者解釋」：表六 → 表九 → 表十二 → 表十四 → 表十八 → 表十九。</label></li><li><input type="checkbox" id="t2-4"><label for="t2-4">接著讀 DFS 的三張關鍵表：<b>表二十一、二十二、二十三</b>（<a href="#p41">¶41</a>～<a href="#p43">¶43</a>）——這三張決定了全文結論能不能成立。</label></li><li><input type="checkbox" id="t2-5"><label for="t2-5">讀洗錢實驗<b>表二十九、三十一、三十二</b>（<a href="#p47">¶47</a>、<a href="#p49">¶49</a>）與配對交易<b>表三十四、三十五</b>（<a href="#p50">¶50</a>、<a href="#p51">¶51</a>）。</label></li><li><input type="checkbox" id="t2-6"><label for="t2-6">把不熟的名詞查清楚：KS 檢定、判別式（對抗式）驗證、DFS、target encoding、cost-sensitive learning。</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">附錄五、六的 17 種特徵選擇方法細節；AutoEncoder 的 Adam 公式。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>全文最強的一個數字是什麼？</summary><div>表二十三：避開法規期之後，DFS＋KS 讓測試 F1 從 0.351 → 0.418，判別 F1 從 1.0 → 0.535。預測變好和偏移下降同時發生。</div></details><details class="ans"><summary>KS 在保險資料一開始為什麼失效？作者給了哪兩個解釋？</summary><div>表十九測試 F1 從 0.378 降到 0.344。作者的解釋是 (1) 2020/7 法規造成結構性改變，(2) 模型欠擬合，刪特徵反而更糟。兩個都是事後解釋。</div></details><details class="ans"><summary>表二十二的 0.427 能不能當證據？</summary><div>要小心：這組是用「訓練集對測試集」做 KS，等於用了測試期的資訊，和作者自己定的「不碰測試集」原則矛盾。</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">一頁摘要＋「證據鏈表」（見 STEP 2 的筆記卡）。</p>
+    </div><div class="pass" style="--pc:var(--y-b)">
+      <div class="ph"><b>第三輪 · 重建與挑戰</b><small>約 4～6 小時（可分兩天）</small></div>
+      <div class="goal"><b>目標：</b>假裝自己要重做這篇：找出隱含假設、評估方法是否站得住，想好你會怎麼改。</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="t3-1"><label for="t3-1">逐一檢查<b>評估流程有沒有用到測試集</b>：表七之後都用「測試 F1 最高的 epoch」報告（<a href="#p31">¶31</a>）；表二十二用測試集做 KS（<a href="#p42">¶42</a>）。各自估計會讓數字偏高多少。</label></li><li><input type="checkbox" id="t3-2"><label for="t3-2">重算一個關鍵判斷：表十的財富等級 p = 0.07，作者寫「顯著」（<a href="#p33">¶33</a>）。用 5% 標準重新下結論。</label></li><li><input type="checkbox" id="t3-3"><label for="t3-3">思考 KS 的限制：樣本數上萬時，p 值幾乎一定趨近 0；應該改看 D 統計量。對照表十五、十七（<a href="#p35">¶35</a>）想想哪些格子其實差異很小。</label></li><li><input type="checkbox" id="t3-4"><label for="t3-4"><b>動手做小型重現</b>：用任一公開表格資料，拿 <code>scipy.stats.ks_2samp</code> 對每個特徵做訓練／測試檢定，再用 XGBoost 做「判別資料來自哪一期」的對抗驗證（看 AUC），親自體會兩種偏移指標的差別。</label></li><li><input type="checkbox" id="t3-5"><label for="t3-5">列出隱含假設：例如「訓練期內部的偏移能代表未來的偏移」（<a href="#p23">¶23</a>）、「法規只影響 P(x) 而不影響 P(y|x)」。</label></li><li><input type="checkbox" id="t3-6"><label for="t3-6">寫下你會怎麼改：滾動式（rolling-origin）評估、用驗證集做 early stopping、報告多次切分的平均與標準差。</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">不用把 74 頁全部精讀；第三輪只深挖支撐主結論的那幾張表。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>如果只能補一個實驗讓結論更可信，你會補什麼？</summary><div>在表二十三的設定下，加入「原始特徵＋KS」的對照組，並且用驗證集挑 epoch、跑 5 次不同切分報告平均，才能分辨 KS 本身有效還是一定要搭配 DFS。</div></details><details class="ans"><summary>這篇的方法在實務上能不能用？</summary><div>在平穩期可以作為「上線前檢查」：先跑對抗驗證看偏移有多大，再決定是否剔除特徵。但遇到法規這類結構斷點，KS 無法預先知道未來分佈，作者自己也承認（<a href="#p53">¶53</a>）。</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">疑問清單（附段號）、改進方案、可以借用到自己研究的點子。</p>
+    </div></div>
+
+  <details class="ans" style="margin-top:14px"><summary>第一輪結束時，用「5C」判斷這篇值不值得往下讀（點開看這篇的 5C）</summary><div>
+    <table class="fivec"><tr><th>Category 類型</th><td>實證型碩士論文：把既有方法（KS、DFS、cost-sensitive）套到三個財金案例上比較，不是提出新理論。</td></tr><tr><th>Context 脈絡</th><td>延續同校辛宥言（2021，洗錢）與郭瑋倫（2021，配對交易）；方法來自 Kanter（2015，DFS）、Bickel（2007，判別式學習）、Khan（2017，成本敏感學習）。</td></tr><tr><th>Correctness 正確性</th><td>初判：依時間切分是對的，但要留意測試集被用來挑 epoch，以及部分「顯著」沒有統計檢定。</td></tr><tr><th>Contributions 貢獻</th><td>(1) 以分佈穩定性作為特徵選擇準則；(2) DFS 補足欠擬合；(3) 比例權重就是 F1 最適權重。</td></tr><tr><th>Clarity 清晰度</th><td>結構清楚，但方法章已經寫出結果、名詞前後不一（James／Kanter、Khan 2015／2017），閱讀時要自己整理。</td></tr></table></div></details>
+
+  <h3 class="g-h"><span>STEP 2</span>這篇可以寫下的閱讀筆記</h3>
+  <p class="g-sub" style="margin-bottom:12px">建議依序完成下面幾張筆記卡；第一張在第一輪寫，證據鏈表在第二輪寫，疑問清單和可借用的點子在第三輪寫。</p>
+  <div class="gnotes"><div class="gnote " style="--nb:var(--y-b);--nbg:var(--y-bg)"><b class="t">① 一句話摘要＋研究問題（第一輪）</b><ul><li><b>一句話：</b>先用 DFS 補特徵、再用 KS 剔除前後分佈不一的特徵，可以緩解欠擬合與資料集偏移；但遇到法規這類結構斷點會失效。</li><li><b>研究問題：</b>特徵在訓練／測試期分佈不同時，要怎麼選特徵，模型才會在未來表現穩定？</li></ul></div><div class="gnote " style="--nb:var(--r-b);--nbg:var(--r-bg)"><b class="t">② 名詞卡（第一、二輪）</b><ul><li><b>KS 檢定：</b>比較兩組樣本的累積分佈最大差距 D；本文用 p 值判斷特徵在兩期是否同分佈。</li><li><b>判別式／對抗驗證：</b>訓練分類器分辨資料來自哪一期，分得越清楚偏移越大。</li><li><b>DFS：</b>沿著表格的關聯，用 SUM、MEAN、LAST 等函數自動合成特徵。</li><li><b>Covariate vs. concept shift：</b>前者是 P(x) 變了，後者是 P(y|x) 變了；KS 只看得到前者。</li><li><b>Cost-sensitive learning：</b>以樣本權重取代過採樣處理不平衡。</li></ul></div><div class="gnote wide" style="--nb:var(--b-b);--nbg:var(--b-bg)"><b class="t">③ 證據鏈表（第二輪，前三列已示範，其餘自己填）</b><table class="ev"><tr><th>表</th><th>比較什麼</th><th>測試 F1 變化</th><th>作者解釋</th><th>我的判斷</th></tr><tr><td>表六</td><td>不平衡處理</td><td>0.209 → 0.369／0.385</td><td>過採樣＝提高成交樣本權重</td><td>可信，差距大</td></tr><tr><td>表十九</td><td>KS 篩選（法規期內）</td><td>0.378 → 0.344</td><td>法規＋欠擬合</td><td>事後解釋，待驗證</td></tr><tr><td>表二十三</td><td>避開法規後 DFS＋KS</td><td>0.351 → 0.418</td><td>避開斷點後 KS 有效</td><td>最強證據，但缺對照組</td></tr><tr><td>表九</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>表二十一</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>表二十九</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table></div><div class="gnote " style="--nb:var(--g-b);--nbg:var(--g-bg)"><b class="t">④ 疑問清單（第三輪）</b><ul><li>用測試集挑 epoch，數字偏高多少？（<a href="#p31">¶31</a>）</li><li>表二十二用測試集分佈做 KS，算不算洩漏？（<a href="#p42">¶42</a>）</li><li>大樣本下 KS 的 p 值有意義嗎？為什麼不報 D？（<a href="#p35">¶35</a>）</li><li>業務員特徵「顯著」改善只有 +0.018，是否在隨機誤差內？（<a href="#p32">¶32</a>）</li><li>權重規則的比例寫反了（<a href="#p46">¶46</a>）。</li></ul></div><div class="gnote " style="--nb:var(--p-b);--nbg:var(--p-bg)"><b class="t">⑤ 可以借用到自己研究的點子</b><ul><li><b>上線前偏移檢查：</b>模型上線前先做對抗驗證，判別 AUC 太高就要警覺。</li><li><b>對照組設計：</b>刪掉「p=1 的特徵」當對照，排除「只是特徵變少」的解釋（<a href="#p36">¶36</a>），這招很好用。</li><li><b>事件期處理：</b>遇到法規、疫情等斷點，至少要分「含／不含事件期」兩組報告。</li><li><b>延伸閱讀：</b>Bickel 2007、Kanter 2015、Khan 2017、Pettitt &amp; Stephens 1977。</li></ul></div></div>
+
+  <h3 class="g-h"><span>STEP 3</span>如何跟教授討論</h3>
+  <div class="prof">
+    <div class="box">
+      <h4>會前準備（前一天完成）</h4>
+      <ol><li>準備<b>一頁 A4</b>：一句話摘要、三條主線各一行、最強與最弱證據各一條（可直接用本頁底部的總覽）。</li><li>印出或截圖 2 張關鍵表：<b>表二十一</b>（法規期內 DFS＋KS 失效）與<b>表二十三</b>（避開法規後有效），兩張對照最能說明全文。</li><li>從右側問題清單挑 <b>3 題</b>排好優先順序；時間不夠時只問第 1 題也有收穫。</li><li>想好一個<b>「下一步提議」</b>，例如：「我想用公開資料重現 KS＋對抗驗證的流程」。教授比較容易對具體提案給意見。</li></ol>
+      <h4 style="margin-top:14px">會談流程（約 15～20 分鐘）</h4>
+      <ol><li><b>3 分鐘</b>：用一句話＋三條主線講完這篇在做什麼。</li><li><b>5 分鐘</b>：你的評估——一個最強處、一個最弱處，各附表號和數字。</li><li><b>5～8 分鐘</b>：問 2～3 個問題（右側清單）。</li><li><b>2 分鐘</b>：提出下一步，請教授確認方向或建議改什麼。</li><li>最後複述一次教授的建議，確認自己理解正確。</li></ol>
+      <h4 style="margin-top:14px">避免這樣說</h4>
+      <ul><li>「這篇不嚴謹」→ 改成「我發現表二十二用了測試期的分佈，所以想請教這樣算不算洩漏」。</li><li>只講摘要內容 → 教授多半已經知道，重點放在你的判斷與問題。</li><li>一次問太多 → 每題附表號，問完就記下教授的回答。</li></ul>
+    </div>
+    <div class="box">
+      <h4>可以問教授的問題（依重要性排序）</h4>
+      <div class="qa"><div class="q">1. 用測試集挑最佳 epoch，在我們的研究裡可以接受嗎？</div><div class="why">為什麼問：這會讓表七之後所有測試 F1 偏高，影響全文的數字可信度（¶31）。</div><div class="say">可以這樣開口：「論文都是用測試 F1 最高的那一輪來報告，我想改成用驗證集做 early stopping 重跑，這樣的做法符合我們實驗室的標準嗎？」</div></div><div class="qa"><div class="q">2. 表二十二用測試集的分佈做 KS，算 transductive 設定還是資料洩漏？</div><div class="why">為什麼問：作者靠這張表主張「KS 原理上有效」，但它違反了自己在 ¶23 定下的原則。</div><div class="say">可以這樣開口：「這組沒有用到標籤，但用了測試期的特徵分佈；如果實際部署，我們事先拿不到這些資料。這樣的結果可以放進論文嗎？」</div></div><div class="qa"><div class="q">3. 遇到法規、疫情這類結構性斷點，我們的研究應該怎麼處理？</div><div class="why">為什麼問：這是這篇最核心的限制，也是你自己做財金資料一定會遇到的問題（¶24、¶53）。</div><div class="say">可以這樣開口：「作者選擇避開事件期，但實務上無法預先知道。老師會建議加入事件變數、分段建模，還是用其他偏移調適的方法？」</div></div><div class="qa"><div class="q">4. 大樣本下 KS 的 p 值幾乎都是 0，是不是應該改看 D 統計量或對抗驗證的 AUC？</div><div class="why">為什麼問：這決定了你之後做特徵篩選時要用什麼門檻（¶35）。</div><div class="say">可以這樣開口：「表十五幾乎所有格子 p 都是 0.000，我在想門檻要不要改成 D 值，例如 D &gt; 0.1 才剔除？」</div></div><div class="qa"><div class="q">5. 這套流程能不能套用在我們手上的資料？</div><div class="why">為什麼問：把討論從「評論別人」轉到「自己的研究下一步」，教授最容易給具體建議。</div><div class="say">可以這樣開口：「我想先用公開資料重現 KS＋對抗驗證的流程，再套到我們的資料上，老師覺得這個方向可以嗎？」</div></div>
+    </div>
+  </div>
+  <div class="prof" style="margin-top:16px;grid-template-columns:1fr">
+    <div class="box"><h4>會後追蹤信範本（當天寄出）</h4><div class="mail">老師好，
+
+謝謝老師今天撥時間討論《自動特徵生成方法與資料集偏移問題於財務機器學習模型探討》。整理今天的重點如下，如有誤解再請老師指正：
+
+1. 老師的建議：（例：評估改用驗證集做 early stopping，並報告多次切分的平均）
+2. 待確認的問題：（例：表二十二的作法是否能放進論文）
+3. 我的下一步：（例：下週前用公開資料完成 KS＋對抗驗證的小型重現，再跟老師報告）
+
+學生 ○○○ 敬上</div></div>
+  </div>
+</section>
 
 <div class="colhead"><div>作者中文原文（節錄・高亮）＋ 表格數據</div><div class="r">中文批注 · 功能／角色／技巧與漏洞</div></div>
 
@@ -1022,6 +1134,23 @@ document.querySelectorAll('.legend button').forEach(function(btn){
     });
   }, {rootMargin:'-70px 0px -70% 0px'});
   secs.forEach(function(s){ io.observe(s); });
+})();
+</script>
+
+<script>
+// 3-Pass 檢查清單：勾選狀態只存在這台電腦的瀏覽器（localStorage），不會上傳
+(function(){
+  var key = 'pass3:' + location.pathname;
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  document.querySelectorAll('.chk input[type=checkbox]').forEach(function(cb){
+    if (saved[cb.id]) { cb.checked = true; cb.closest('li').classList.add('done'); }
+    cb.addEventListener('change', function(){
+      cb.closest('li').classList.toggle('done', cb.checked);
+      saved[cb.id] = cb.checked;
+      try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e) {}
+    });
+  });
 })();
 </script>
 </body>

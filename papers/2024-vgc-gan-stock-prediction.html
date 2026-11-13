@@ -135,6 +135,53 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
 .tbl-lbl{display:block;font:600 11px var(--ui);letter-spacing:.08em;color:#2c6db3;margin-bottom:4px}
 .top .home{display:inline-block;color:#cdd3e2;text-decoration:none;font-size:13px;margin-bottom:12px;border-bottom:1px dotted rgba(255,255,255,.35)}
 .top .home:hover{color:#fff}
+
+/* ===== 3-Pass 讀法教學 ===== */
+.guide{margin:30px 0 8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 28px}
+.guide h2{font-family:var(--zh);font-size:23px;margin:0 0 4px}
+.guide .g-sub{color:var(--muted);font-size:14px;line-height:1.75;margin:0 0 18px}
+.guide h3.g-h{display:flex;align-items:center;gap:10px;font-family:"Noto Sans TC",var(--ui);font-size:17px;margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.guide h3.g-h span{font:600 11px var(--ui);letter-spacing:.1em;color:#fff;background:var(--navy);border-radius:4px;padding:3px 8px}
+.passes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pass{border:1px solid var(--line);border-top:5px solid var(--pc);border-radius:9px;background:#fff;padding:16px 16px 12px;font-size:14px;line-height:1.75}
+.pass .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.pass .ph b{font-size:16px;font-family:"Noto Sans TC",var(--ui)}
+.pass .ph small{font:500 12px var(--ui);color:var(--muted);white-space:nowrap}
+.pass .goal{background:var(--paper);border-radius:6px;padding:8px 10px;margin:6px 0 10px;font-size:13.5px}
+.pass h4{font:600 12px var(--ui);letter-spacing:.06em;color:var(--muted);margin:12px 0 4px}
+.chk{list-style:none;margin:0;padding:0}
+.chk li{display:flex;gap:8px;align-items:flex-start;margin:5px 0}
+.chk input{margin-top:5px;flex:none;accent-color:var(--navy)}
+.chk label{cursor:pointer}
+.chk li.done label{color:var(--muted);text-decoration:line-through}
+.pass a, .gnote a, .prof a{color:var(--navy);text-decoration:none;border-bottom:1px dotted var(--navy)}
+details.ans{margin:6px 0;border:1px solid var(--line);border-radius:6px;background:#fffdf8}
+details.ans summary{cursor:pointer;padding:6px 10px;font-weight:500;font-size:13.5px}
+details.ans div{padding:2px 12px 10px;font-size:13.5px;color:#4a463c}
+.fivec{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+.fivec th,.fivec td{border-top:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.65}
+.fivec th{white-space:nowrap;color:var(--navy);width:1%}
+.gnotes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.gnote{border-left:4px solid var(--nb);background:var(--nbg);border-radius:0 8px 8px 0;padding:12px 15px;font-size:14px;line-height:1.75}
+.gnote b.t{display:block;font-size:15px;margin-bottom:4px}
+.gnote ul{margin:4px 0 0;padding-left:18px}
+.gnote.wide{grid-column:1/-1}
+.ev{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;background:#fff}
+.ev th,.ev td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;line-height:1.6}
+.ev th{background:#f3efe4;font-weight:600}
+.ev td.blank{color:#b3ab98}
+.prof{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px;font-size:14px;line-height:1.75}
+.prof .box{background:#fff;border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+.prof h4{margin:0 0 6px;font-size:15px}
+.prof ol,.prof ul{margin:4px 0 0;padding-left:20px}
+.prof li{margin:4px 0}
+.qa{border-top:1px dashed var(--line);padding:9px 0}
+.qa:first-of-type{border-top:0}
+.qa .q{font-weight:600}
+.qa .why{color:#255d2f;font-size:13.5px}
+.qa .say{background:var(--paper);border-radius:6px;padding:6px 10px;margin-top:4px;font-size:13.5px}
+.mail{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:12px 14px;font:13.5px/1.75 var(--ui);margin-top:6px}
+@media (max-width:900px){.passes,.gnotes,.prof{grid-template-columns:1fr}.guide{padding:20px 16px}}
 </style>
 </head>
 <body>
@@ -160,6 +207,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
 
 <nav class="secnav" aria-label="章節導航">
   <div class="wrap">
+    <a href="#guide">3-Pass 讀法</a>
     <a href="#abs">摘要</a>
     <a href="#s1">1 緒論</a>
     <a href="#s2">2 相關研究</a>
@@ -182,6 +230,70 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding:10px 0 50px
     <li><b>批注卡片顏色</b>對應該段的主要論證功能（黃＝論點、紅＝概念、藍＝證據、綠＝讓步／反駁、紫＝方法）。批注中 <span class="flaw" style="color:#8a2f20">紅字</span> 是潛在漏洞，<span style="color:#255d2f">綠字</span> 是值得學習的論證技巧。</li>
   </ul>
 </div>
+
+
+<section class="guide sec" id="guide">
+  <h2>3-Pass 讀法教學：這篇怎麼讀</h2>
+  <p class="g-sub">三輪讀法出自 S. Keshav〈How to Read a Paper〉：同一篇論文分三次讀，每一輪的目的不同，一輪比一輪深入。下面依照<b>這篇論文的頁碼、章節和表格</b>寫成具體步驟；勾選框會記在你這台電腦的瀏覽器裡，方便追蹤進度。下方批注的 ¶ 段號可以直接點擊跳轉。</p>
+
+  <h3 class="g-h"><span>STEP 1</span>三階段怎麼讀</h3>
+  <div class="passes"><div class="pass" style="--pc:var(--b-b)">
+      <div class="ph"><b>第一輪 · 鳥瞰</b><small>約 10 分鐘</small></div>
+      <div class="goal"><b>目標：</b>知道模型長什麼樣、宣稱贏了誰、值不值得細讀。</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="v1-1"><label for="v1-1">讀標題、<b>摘要</b>與關鍵字（第 1 頁）。</label></li><li><input type="checkbox" id="v1-2"><label for="v1-2">看<b>圖一（模型架構圖，第 3 頁）</b>：找出三大區塊——關係圖生成、序列分解、生成對抗模組。</label></li><li><input type="checkbox" id="v1-3"><label for="v1-3">讀緒論最後的<b>三項貢獻</b>（第 2 頁，<a href="#p9">¶9</a>），這是作者要兌現的承諾。</label></li><li><input type="checkbox" id="v1-4"><label for="v1-4">掃過所有<b>章節標題</b>，再看<b>表二</b>（第 9 頁）只看最後一列 VGC-GAN 的準確率：0.53～0.57。</label></li><li><input type="checkbox" id="v1-5"><label for="v1-5">讀<b>結論</b>（第 13 頁），特別是最後一段的限制。</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">所有公式（VMD、GCN、GRU、WGAN-GP）、相關研究的長串文獻、超參數表。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>模型名稱的每個字母代表什麼？</summary><div>V＝VMD 序列分解、G＝Graph（多張關聯圖）、C＝Convolution（圖卷積）、GAN＝生成對抗訓練。</div></details><details class="ans"><summary>作者說現有方法缺什麼？</summary><div>預設關係圖需要額外資料；用價格相關建圖的研究只看同步、全期的相關，忽略局部相關與領先—落後關係。</div></details><details class="ans"><summary>第一眼看到準確率 0.53～0.57，該想到什麼？</summary><div>方向預測只比丟銅板好一點。第二輪要追問：基準是什麼？有沒有和「明天＝今天」比較？</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">一句話摘要、5C 判斷、名詞清單（VMD、FastDTW、GCN、WGAN-GP）。</p>
+    </div><div class="pass" style="--pc:var(--p-b)">
+      <div class="ph"><b>第二輪 · 抓內容</b><small>約 1～1.5 小時</small></div>
+      <div class="goal"><b>目標：</b>弄懂資料怎麼流過模型，並把每張表的結論整理成證據鏈。</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="v2-1"><label for="v2-1">對照圖一，讀<b>第 3.2 節架構總覽</b>（<a href="#p15">¶15</a>），自己畫出資料流：股價 → VMD 拆成 K 條子序列 → 每條各一個 GAN → 預測相加。</label></li><li><input type="checkbox" id="v2-2"><label for="v2-2">讀<b>第 3.4 節建圖</b>（<a href="#p19">¶19</a>～<a href="#p22">¶22</a>），列出 6 張圖：Pearson、Spearman、FastDTW × 全局、局部。</label></li><li><input type="checkbox" id="v2-3"><label for="v2-3">讀<b>第 4 章</b>：表一的資料切分（7:1:2）、前處理（<a href="#p28">¶28</a>）、參數、指標、基準（<a href="#p31">¶31</a>）。</label></li><li><input type="checkbox" id="v2-4"><label for="v2-4">依序讀<b>表二 → 表四 → 表六 → 表七 → 表八 → 表十</b>，每張記下「拿掉或改了什麼、三個資料集的準確率變化」。</label></li><li><input type="checkbox" id="v2-5"><label for="v2-5">看圖六至八的預測曲線，問自己：「如果只用昨天的價格當預測，曲線會不會一樣貼？」（<a href="#p33">¶33</a>）</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">GA 的目標函數推導、FastDTW 三步驟細節、GRU 閘門公式。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>哪個模組對準確率貢獻最大？</summary><div>看表七：拿掉序列分解，準確率掉最多（ETF 0.5285 → 0.4941）；拿掉 Multi-GCN 次之；拿掉 GAN 幾乎沒變（0.5278）。</div></details><details class="ans"><summary>6 張圖都有用嗎？</summary><div>表六顯示 DTW 單獨使用最差（DJIA 0.4972），但加進組合後有幫助；全局＋局部最好。</div></details><details class="ans"><summary>超參數 k、Tw 是怎麼選的？</summary><div>看起來是直接看測試集結果挑的（表八、表十），而且 SSE 在 Tw=45 時誤差比採用的 30 更低。</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">架構資料流圖＋證據鏈表（見 STEP 2）。</p>
+    </div><div class="pass" style="--pc:var(--y-b)">
+      <div class="ph"><b>第三輪 · 重建與挑戰</b><small>約 4～8 小時（含動手）</small></div>
+      <div class="goal"><b>目標：</b>親手驗證論文最關鍵的兩個疑點：有沒有打敗隨機漫步？VMD 有沒有偷看未來？</div>
+      <h4>依序這樣讀</h4><ul class="chk"><li><input type="checkbox" id="v3-1"><label for="v3-1"><b>算隨機漫步基準</b>：用 yfinance 下載道瓊 29 檔成分股 2018～2020 年收盤價，取最後 151 天，把「昨天收盤價」當預測，算 RMSE、MAPE 和方向準確率，與表二的 DJIA（RMSE 4.0661、MAPE 2.285%、準確率 0.5712）比較。</label></li><li><input type="checkbox" id="v3-2"><label for="v3-2"><b>算「永遠猜上漲」的準確率</b>：同樣這 151 天，2020 下半年美股大多上漲，看它和 0.5712 差多少。</label></li><li><input type="checkbox" id="v3-3"><label for="v3-3"><b>測試 VMD 的前視偏誤</b>：對同一條序列，分別用「整段分解」和「每天只用到當天為止的資料分解」，比較最後幾天的子序列值差多少（<a href="#p28">¶28</a>）。</label></li><li><input type="checkbox" id="v3-4"><label for="v3-4"><b>價格 vs. 報酬建圖</b>：分別用價格和日報酬計算 Pearson 相關，在門檻 0.9 下數邊數，體會「趨勢造成的虛假相關」（<a href="#p20">¶20</a>）。</label></li><li><input type="checkbox" id="v3-5"><label for="v3-5">列出隱含假設：股票關係在測試期不變、DTW 能代表領先—落後（<a href="#p21">¶21</a>）、各基準的訓練預算公平（<a href="#p31">¶31</a>）。</label></li><li><input type="checkbox" id="v3-6"><label for="v3-6">可以對照資料夾裡的報告投影片《0114_VGC-GAN》最後一頁的 Comment（改用 Temporal GNN、增加特徵），想想你同不同意。</label></li></ul>
+      <h4>先跳過</h4><p style="margin:0;font-size:13.5px">不用重現整個 VGC-GAN；只要驗證上面兩個疑點，就足以判斷結論的可信度。</p>
+      <h4>讀完要能回答（點開看參考答案）</h4><details class="ans"><summary>如果隨機漫步的 MAPE 比 2.285% 還低，代表什麼？</summary><div>代表模型在價格誤差上沒有打敗最簡單的基準，表二「全面最佳」的說法就站不住；之後應該改用報酬率或方向作為主要指標。</div></details><details class="ans"><summary>如果要把這篇當成你研究的基準，你會先改哪裡？</summary><div>(1) 改預測報酬率而不是價格；(2) VMD 改成逐窗分解；(3) 超參數只用驗證集挑；(4) 加入隨機漫步、永遠上漲、Multi-GCGRU 三個基準；(5) 多跑幾次報告平均與標準差。</div></details>
+      <h4>這一輪的產出</h4><p style="margin:0;font-size:13.5px">兩個驗證實驗的結果（各一張小表）＋疑問清單＋改進方案。</p>
+    </div></div>
+
+  <details class="ans" style="margin-top:14px"><summary>第一輪結束時，用「5C」判斷這篇值不值得往下讀（點開看這篇的 5C）</summary><div>
+    <table class="fivec"><tr><th>Category 類型</th><td>模型提出型論文：設計新架構（VGC-GAN），再用基準比較與消融實驗證明有效。</td></tr><tr><th>Context 脈絡</th><td>股票圖神經網路（Chen 2018、GCGRU、Multi-GCGRU、THGNN）＋分解混合模型（VMD＋LSTM、Liu 2022）＋GAN 預測（Kumar 2022、WGAN-GP）。</td></tr><tr><th>Correctness 正確性</th><td>初判：預測目標是價格水準，要特別確認有沒有和隨機漫步比較；資料只有收盤價。</td></tr><tr><th>Contributions 貢獻</th><td>(1) 只用價格建 6 張同步／非同步關聯圖；(2) GA＋殘差相關最佳化 VMD 參數；(3) 三個資料集的實證比較。</td></tr><tr><th>Clarity 清晰度</th><td>架構圖清楚、章節分明，容易讀；但部分標題與圖說有誤植，引用也有對調。</td></tr></table></div></details>
+
+  <h3 class="g-h"><span>STEP 2</span>這篇可以寫下的閱讀筆記</h3>
+  <p class="g-sub" style="margin-bottom:12px">建議依序完成下面幾張筆記卡；第一張在第一輪寫，證據鏈表在第二輪寫，疑問清單和可借用的點子在第三輪寫。</p>
+  <div class="gnotes"><div class="gnote " style="--nb:var(--y-b);--nbg:var(--y-bg)"><b class="t">① 一句話摘要＋研究問題（第一輪）</b><ul><li><b>一句話：</b>只用歷史股價建立 6 張關聯圖，結合 VMD 降噪與「對抗＋監督」訓練，預測隔日收盤價。</li><li><b>研究問題：</b>不靠額外財務資料，能不能從價格本身學到股票之間的同步與領先—落後關係，並用來改善預測？</li></ul></div><div class="gnote " style="--nb:var(--r-b);--nbg:var(--r-bg)"><b class="t">② 名詞卡（第一、二輪）</b><ul><li><b>VMD／IMF：</b>把序列拆成 K 條頻寬有限的子序列，相加可以還原。</li><li><b>FastDTW：</b>允許時間錯位的序列距離，線性時間近似 DTW；本身不分誰領先。</li><li><b>GCN：</b>用正規化鄰接矩陣把鄰居節點的資訊混進來。</li><li><b>WGAN-GP：</b>用 Wasserstein 距離＋梯度懲罰，讓 GAN 訓練較穩定。</li><li><b>隨機漫步基準：</b>預測明天＝今天，是價格預測必須打敗的最低門檻。</li></ul></div><div class="gnote wide" style="--nb:var(--b-b);--nbg:var(--b-bg)"><b class="t">③ 證據鏈表（第二輪，前三列已示範，其餘自己填）</b><table class="ev"><tr><th>表</th><th>比較什麼</th><th>準確率（ETF／SSE／DJIA）</th><th>作者結論</th><th>我的判斷</th></tr><tr><td>表二</td><td>VGC-GAN vs. 10 個基準</td><td>0.5285／0.5673／0.5712</td><td>全面最佳</td><td>缺隨機漫步基準；多數基準 &lt; 0.5，可能沒調好</td></tr><tr><td>表七</td><td>拿掉 GAN</td><td>0.5278／0.5669／0.5664</td><td>每個模組都重要</td><td>GAN 對方向幾乎無貢獻</td></tr><tr><td>表十</td><td>Tw = 30 vs. 45</td><td>SSE MAPE 2.415% vs. 2.073%</td><td>30 最穩健</td><td>SSE 其實 45 較好；用測試集挑參數</td></tr><tr><td>表四</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>表六</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>表八</td><td class="blank">（自己填）</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table></div><div class="gnote " style="--nb:var(--g-b);--nbg:var(--g-bg)"><b class="t">④ 疑問清單（第三輪）</b><ul><li>沒有和隨機漫步、永遠猜上漲比較（<a href="#p32">¶32</a>）。</li><li>VMD 對整段測試序列分解，會不會偷看未來？（<a href="#p28">¶28</a>）</li><li>用價格而不是報酬計算相關，邊是不是只反映共同趨勢？（<a href="#p20">¶20</a>）</li><li>學習率 0.008 與 8e-4 哪個才對？（<a href="#p29">¶29</a>）</li><li>沒有公開程式碼，資料「依請求提供」，如何重現？（<a href="#p9">¶9</a>）</li></ul></div><div class="gnote " style="--nb:var(--p-b);--nbg:var(--p-bg)"><b class="t">⑤ 可以借用到自己研究的點子</b><ul><li><b>多角度建圖：</b>同時用線性、等級、形狀相似三種度量，比單一相關係數穩健。</li><li><b>消融設計：</b>表六「逐步疊加」與表七「逐一拆掉」的寫法，可以直接套用在自己的論文。</li><li><b>全局＋局部：</b>用滑動視窗平均補捉時變關係，是邁向動態圖之前的簡單版本。</li><li><b>延伸閱讀：</b>Multi-GCGRU（Ye 2021）、THGNN（Xiang 2022）、Liu 2022（逐窗 VMD）、DLinear（Zeng 2023，強而簡單的基準）。</li></ul></div></div>
+
+  <h3 class="g-h"><span>STEP 3</span>如何跟教授討論</h3>
+  <div class="prof">
+    <div class="box">
+      <h4>會前準備（前一天完成）</h4>
+      <ol><li>準備<b>一頁 A4</b>：一句話摘要、架構資料流圖、最強與最弱證據各一條。</li><li>帶 2 張關鍵表：<b>表二</b>（主比較）與<b>表七</b>（模組消融），兩張一起看最能說明「GAN 對方向幾乎沒貢獻」。</li><li>如果第三輪做了<b>隨機漫步驗證</b>，把結果做成一列，和表二的 DJIA 並排——這是最有份量的討論材料。</li><li>想好下一步提議，例如：「我想把這篇當基準，改成預測報酬率、VMD 改逐窗分解後重跑」。</li></ol>
+      <h4 style="margin-top:14px">會談流程（約 15～20 分鐘）</h4>
+      <ol><li><b>3 分鐘</b>：講清楚架構（6 張圖 → VMD → GAN）與宣稱的結果。</li><li><b>5 分鐘</b>：你的評估——消融設計是優點；缺隨機漫步基準與 VMD 洩漏是疑點，各附表號。</li><li><b>5～8 分鐘</b>：問 2～3 個問題（右側清單）。</li><li><b>2 分鐘</b>：提出是否重現、要改哪些設定，請教授確認。</li><li>最後複述教授的建議，確認理解一致。</li></ol>
+      <h4 style="margin-top:14px">避免這樣說</h4>
+      <ul><li>「這篇模型沒用」→ 改成「準確率 0.53～0.57，我想確認它和隨機漫步比起來有沒有顯著差異」。</li><li>只講架構細節 → 教授更在意證據能不能支持結論。</li><li>沒有數字的質疑 → 每個疑點都附表號和數字，或附上你自己算的驗證結果。</li></ul>
+    </div>
+    <div class="box">
+      <h4>可以問教授的問題（依重要性排序）</h4>
+      <div class="qa"><div class="q">1. 價格預測論文沒有和隨機漫步比較，這樣的結果可信嗎？我們做研究時要不要固定加這個基準？</div><div class="why">為什麼問：這是判斷整篇結論能否成立的關鍵，也會影響你自己之後的實驗設計（¶32、¶33）。</div><div class="say">可以這樣開口：「我用道瓊同一段期間算了「明天＝今天」的誤差，結果是（填你的數字），和表二的 VGC-GAN 比起來（較好／較差）。老師覺得我們做研究時是不是一定要放這個基準？」</div></div><div class="qa"><div class="q">2. VMD 對整段測試序列分解，算不算前視偏誤？</div><div class="why">為什麼問：作者在 ¶28 宣稱避免了洩漏，但非因果分解仍會用到未來資料；這點會直接影響數字的可信度。</div><div class="say">可以這樣開口：「作者說用訓練集的參數分解測試集，但 VMD 分解第 t 天時也會用到 t 之後的資料。我的小實驗顯示最後幾天的子序列差了（填數字），這樣的作法可以接受嗎？」</div></div><div class="qa"><div class="q">3. 我們的研究應該預測價格水準、報酬率，還是漲跌方向？</div><div class="why">為什麼問：預測目標決定了評估指標和基準；價格水準的 RMSE 很容易看起來很好（¶14）。</div><div class="say">可以這樣開口：「這篇預測的是收盤價，RMSE 看起來很小，但方向準確率只有五成多。如果我要做類似研究，老師建議用哪一種目標？」</div></div><div class="qa"><div class="q">4. 多圖＋GAN 的複雜度，值得嗎？</div><div class="why">為什麼問：DLinear 訓練只要 1 秒、架構極簡，在某些資料集的誤差也不差；表七顯示 GAN 對方向幾乎沒有貢獻（¶36）。</div><div class="say">可以這樣開口：「如果拿掉 GAN、只留 Multi-GCN＋GRU＋MSE，準確率幾乎一樣。老師覺得做研究時，要怎麼判斷複雜架構是否值得？」</div></div><div class="qa"><div class="q">5. 要不要把這篇當成我們的基準模型重現？</div><div class="why">為什麼問：論文沒有公開程式碼，重現需要時間；先跟教授確認優先順序。</div><div class="say">可以這樣開口：「我想先重現簡化版（Multi-GCN＋GRU，改用報酬率、逐窗 VMD），大概需要（填週數）。老師覺得值得做，還是先做其他方向？」</div></div>
+    </div>
+  </div>
+  <div class="prof" style="margin-top:16px;grid-template-columns:1fr">
+    <div class="box"><h4>會後追蹤信範本（當天寄出）</h4><div class="mail">老師好，
+
+謝謝老師今天撥時間討論〈VGC-GAN: A multi-graph convolution adversarial network for stock price prediction〉。整理今天的重點如下，如有誤解再請老師指正：
+
+1. 老師的建議：（例：之後的價格預測實驗一律加入隨機漫步與永遠猜上漲兩個基準）
+2. 待確認的問題：（例：VMD 改逐窗分解後，結果差多少）
+3. 我的下一步：（例：下週前完成簡化版重現，並比較價格與報酬兩種預測目標）
+
+學生 ○○○ 敬上</div></div>
+  </div>
+</section>
 
 <div class="colhead"><div>英文重述（高亮）＋ 繁體中文譯文</div><div class="r">中文批注 · 功能／角色／技巧與漏洞</div></div>
 
@@ -890,6 +1002,23 @@ document.querySelectorAll('.legend button').forEach(function(btn){
     });
   }, {rootMargin:'-70px 0px -70% 0px'});
   secs.forEach(function(s){ io.observe(s); });
+})();
+</script>
+
+<script>
+// 3-Pass 檢查清單：勾選狀態只存在這台電腦的瀏覽器（localStorage），不會上傳
+(function(){
+  var key = 'pass3:' + location.pathname;
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  document.querySelectorAll('.chk input[type=checkbox]').forEach(function(cb){
+    if (saved[cb.id]) { cb.checked = true; cb.closest('li').classList.add('done'); }
+    cb.addEventListener('change', function(){
+      cb.closest('li').classList.toggle('done', cb.checked);
+      saved[cb.id] = cb.checked;
+      try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e) {}
+    });
+  });
 })();
 </script>
 </body>
