@@ -31,6 +31,8 @@ a{color:inherit}
 .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
 .top .home{display:inline-block;color:#cdd3e2;text-decoration:none;font-size:13px;margin-bottom:12px;border-bottom:1px dotted rgba(255,255,255,.35)}
 .top .home:hover{color:#fff}
+.top .intro-link{display:inline-block;margin:12px 0 0;background:#fff0a3;color:#14213d;text-decoration:none;font-weight:600;font-size:13.5px;padding:6px 12px;border-radius:6px}
+.top .intro-link:hover{background:#fff}
 .top .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
 .top h1{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.6vw,28px);line-height:1.35;margin:6px 0 4px}
 .top .en-title{font-family:"Lora",serif;font-style:italic;font-size:15px;opacity:.85}
@@ -184,6 +186,58 @@ details.ans div{padding:2px 12px 10px;font-size:13.5px;color:#4a463c}
 .mail{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:12px 14px;font:13.5px/1.75 var(--ui);margin-top:6px}
 @media (max-width:900px){.passes,.gnotes,.prof{grid-template-columns:1fr}.guide{padding:20px 16px}}
 </style>
+<style>
+/* ===== 閱讀輔助 ===== */
+#rd-top{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;border:0;background:#14213d;color:#fff;font:600 19px/1 "IBM Plex Sans","Noto Sans TC",sans-serif;box-shadow:0 4px 14px rgba(20,33,61,.3);cursor:pointer;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s}
+#rd-top span{font-size:10px;font-weight:500;margin-top:2px;letter-spacing:.05em}
+#rd-top.show{opacity:1;transform:none;pointer-events:auto}
+#rd-top:hover{background:#22325a}
+#rd-top:focus-visible{outline:3px solid #d9a800;outline-offset:2px}
+
+nav.toc a.on{background:#fff;color:#14213d;font-weight:600}
+
+.rd-term{all:unset;cursor:pointer;border-bottom:1.5px dashed #2c6db3;border-radius:1px}
+.rd-term:hover,.rd-term:focus-visible{background:#d5e6fb}
+a.rd-ref{color:#14213d;text-decoration:none;border-bottom:1px dotted #14213d;font-weight:600}
+a.rd-ref:hover{background:#fff0a3}
+
+#rd-pop{position:fixed;z-index:80;background:#fff;border:1px solid #ddd5c3;border-radius:10px;box-shadow:0 12px 32px rgba(20,33,61,.2);padding:14px 16px 12px;font:14px/1.75 "IBM Plex Sans","Noto Sans TC",sans-serif;color:#2b2924;max-height:70vh;overflow:auto}
+#rd-pop b{display:block;font-size:15.5px;margin:0 28px 4px 0;color:#14213d}
+#rd-pop p{margin:6px 0}
+#rd-pop .like{background:#fffaf0;border-left:3px solid #d9a800;padding:6px 10px;border-radius:0 6px 6px 0}
+#rd-pop .like::before{content:"🍎 比喻　";font-weight:600;color:#8a6a00}
+#rd-pop .here{background:#f2f7fd;border-left:3px solid #2c6db3;padding:6px 10px;border-radius:0 6px 6px 0}
+#rd-pop .here::before{content:"📄 在這篇　";font-weight:600;color:#23476f}
+#rd-pop .x{all:unset;cursor:pointer;position:absolute;top:8px;right:10px;color:#706a5c;font-size:15px;padding:2px 6px;border-radius:4px}
+#rd-pop .x:hover{background:#f3efe4}
+#rd-pop.sheet{left:0;right:0;bottom:0;top:auto;width:auto;border-radius:14px 14px 0 0;max-height:62vh;padding-bottom:22px}
+
+#rd-ov{position:fixed;inset:0;background:rgba(20,33,61,.38);z-index:50}
+#rd-peek{position:fixed;top:0;right:0;bottom:0;width:min(640px,94vw);z-index:60;background:#faf7f0;box-shadow:-12px 0 32px rgba(0,0,0,.22);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s ease}
+#rd-peek.open{transform:none}
+#rd-peek .hd{display:flex;align-items:center;gap:10px;padding:12px 14px 12px 18px;background:#14213d;color:#fff;font:14px "IBM Plex Sans","Noto Sans TC",sans-serif}
+#rd-peek .tt{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rd-peek .go{flex:none;color:#14213d;background:#fff0a3;text-decoration:none;font-weight:600;padding:6px 10px;border-radius:6px;font-size:13px;white-space:nowrap}
+#rd-peek .go:hover{background:#fff}
+#rd-peek .x{all:unset;cursor:pointer;flex:none;color:#fff;font-size:18px;padding:2px 8px;border-radius:4px}
+#rd-peek .x:hover,#rd-peek .x:focus-visible{background:rgba(255,255,255,.15)}
+#rd-peek .bd{flex:1;overflow:auto;padding:4px 18px 40px;-webkit-overflow-scrolling:touch}
+#rd-peek .row{display:grid;grid-template-columns:1fr !important;gap:14px;border-bottom:0;padding:14px 0}
+html.rd-lock{overflow:hidden}
+
+#rd-toast{position:fixed;left:50%;bottom:22px;z-index:45;display:flex;align-items:center;gap:10px;max-width:min(560px,calc(100vw - 100px));background:#14213d;color:#fff;border-radius:10px;padding:10px 10px 10px 16px;font:14px/1.5 "IBM Plex Sans","Noto Sans TC",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translate(-50%,16px);transition:opacity .25s,transform .25s}
+#rd-toast.show{opacity:1;transform:translate(-50%,0)}
+#rd-toast .msg{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rd-toast b{color:#fff0a3}
+#rd-toast .go{all:unset;cursor:pointer;flex:none;background:#fff0a3;color:#14213d;font-weight:600;padding:6px 10px;border-radius:6px;font-size:13px}
+#rd-toast .x{all:unset;cursor:pointer;flex:none;padding:2px 6px;opacity:.75}
+@media (max-width:600px){
+  #rd-toast{left:12px;right:74px;max-width:none;transform:translateY(16px)}
+  #rd-toast.show{transform:none}
+  #rd-top{right:12px;bottom:14px}
+}
+@media print{#rd-top,#rd-toast,#rd-peek,#rd-ov,#rd-pop{display:none!important}}
+</style>
 </head>
 <body>
 
@@ -194,6 +248,7 @@ details.ans div{padding:2px 12px 10px;font-size:13.5px;color:#4a463c}
     <h1>自動特徵生成方法與資料集偏移問題於財務機器學習模型探討</h1>
     <div class="en-title">Automatic Feature Generation and Insight of Dataset Shift in Finance Machine Learning Models</div>
     <div class="meta">國立陽明交通大學 資訊管理與財務金融學系 財務金融碩士班 · 碩士論文（2022 年 7 月）· 研究生 白建濠 · 指導教授 戴天時</div>
+    <a class="intro-link" href="2022-auto-feature-dataset-shift-intro.html">第一次讀這篇？先看 30 分鐘白話導讀 →</a>
     <div class="legend" role="group" aria-label="顏色圖例">
       <span class="lbl">分析維度</span>
       <button data-k="t" aria-pressed="true"><i style="background:var(--y);box-shadow:inset 0 -2px 0 var(--y-b)"></i>核心論點 Thesis</button>
@@ -1152,6 +1207,233 @@ document.querySelectorAll('.legend button').forEach(function(btn){
     });
   });
 })();
+</script>
+<script>window.READER_CONFIG={"mode": "paper", "glossary": [{"t": "F1 分數", "p": ["F1 Score", "F1 Scroe", "F1-Score", "F1"], "plain": "0 到 1 的分數，衡量「少數但重要的那一類」有沒有被抓到、抓得準不準。越接近 1 越好。", "like": "100 張保單只有 15 張成交。全部猜「不會成交」正確率也有 85%，但一張都沒抓到；F1 就是用來揪出這種偷懶。", "here": "保險案例的 F1 大約在 0.3～0.4，所以 0.381 → 0.409 是在很低的起點上小幅進步。"}, {"t": "KS 檢定", "p": ["Kolmogorov-Smirnov test", "Kolmogorov-Smirnov Test", "Kolmogorov test", "Komlogorov-Smirnov Test", "KS test", "KS Test", "KS 檢定", "KS"], "plain": "比較兩堆資料的分佈像不像。p 值越小，代表兩邊越不一樣。", "like": "把 A 班和 B 班的身高長條圖疊在一起，看兩條曲線最遠差多少。", "here": "作者對每條線索做 KS 檢定，p 值接近 0 的就丟掉，因為它在練習期和考試期長得不一樣。"}, {"t": "p 值", "p": ["P 值", "p 值", "P值", "p值"], "plain": "衡量「這個差異是不是巧合」。越小越不像巧合；常用 0.05 當門檻。", "like": "丟 10 次硬幣出現 10 次正面，p 值很小，代表這枚硬幣大概有問題。", "here": "樣本數上萬時，p 值幾乎都會接近 0，所以光看 p 值容易高估差異。"}, {"t": "判別式學習（對抗驗證）", "p": ["Discriminative Learning", "Discriminative Leaning", "discriminative learning", "Discriminative Boundary", "判別式學習"], "plain": "另外訓練一個「偵探」模型，猜每筆資料來自練習期還是考試期。猜得越準，兩期差越多。", "like": "把兩班學生混在一起，只看身高猜是哪一班；一猜就中，代表兩班身高差很多。", "here": "偵探的 F1 為 1.0 代表完全分得出來（偏移很嚴重），越低代表兩期越像。"}, {"t": "資料集偏移 Dataset shift", "p": ["資料集偏移", "dataset shift", "Dataset shift", "dataset shift 問題"], "plain": "練習時和上場時的資料長得不一樣，學到的規則就不管用了。", "like": "整學期都練選擇題，期末考卻全部是申論題。", "here": "保險案例的考試期碰上 2020 年 7 月金管會新法規，購買行為突然改變。"}, {"t": "共變量偏移 Covariate shift", "p": ["covariate shift", "Covariate shift", "共變量偏移"], "plain": "資料集偏移的一種：線索本身（例如保費）的分佈變了，但線索和答案的關係沒變。", "like": "考題題型沒變，只是這次考生的程度比較好。", "here": "KS 檢定只能抓到這一種偏移；如果是「線索和答案的關係」變了，KS 看不出來。"}, {"t": "深度特徵合成 DFS", "p": ["Deep Feature Synthesis", "Deep Features Synthesis", "Deep Featur Synthesis", "深度特徵合成", "DFS"], "plain": "把好幾張相關的表格串起來，用加總、平均、最新一筆等方式，自動算出大量新線索。", "like": "從訂單表、客戶表、業務員表，自動算出「客戶總共買多少」「業務員平均每單多少錢」。", "here": "保險案例自動產生了 1,242 個新線索，用來解決欠擬合。"}, {"t": "transformative primitives", "p": ["transformative primitives"], "plain": "DFS 用來產生新線索的計算方式，例如 SUM（加總）、MEAN（平均）、LAST（最新一筆）。", "like": "就像 Excel 的 SUM、AVERAGE 函數。", "here": ""}, {"t": "特徵 Feature", "p": ["特徵工程", "特徵選擇", "特徵"], "plain": "模型用來猜答案的「線索」。準備線索叫特徵工程，挑選要留哪些線索叫特徵選擇。", "like": "醫生判斷感冒看的體溫、咳嗽、喉嚨痛，就是特徵。", "here": ""}, {"t": "資料不平衡", "p": ["不平衡資料集", "資料不平衡", "不平衡"], "plain": "某一類資料特別少，模型就容易忽略它。", "like": "85 人要吃麥當勞、15 人要吃壽司，每人一票的話壽司永遠選不上。", "here": "成交保單和未成交保單大約是 1：5.4。"}, {"t": "過採樣 Over-sampling", "p": ["Over-sampling", "Oversampling", "over-sampling", "過採樣"], "plain": "把少數類的資料複製到和多數類一樣多，讓模型不會忽略它。", "like": "壽司組的票影印 5 份，讓兩組票數一樣多。", "here": ""}, {"t": "加權交叉熵／成本敏感學習", "p": ["weighted cross entropy", "Weighted cross entropy", "加權交叉熵", "cost sensitive learning", "cost-sensitive learning", "Cost Sensitive Learning", "Cost Sensitive", "成本敏感學習"], "plain": "不複製資料，而是讓少數類的每一筆在計分時「算比較重」。", "like": "壽司組每人算 5.4 票。", "here": "作者發現「照數量比例加權」就夠好，比 Khan 等人的動態調整方法更好。"}, {"t": "XGBoost", "p": ["Xgboost", "XGBoost", "XGboost", "XGBOOST"], "plain": "一種很常用、預測力很強的機器學習模型，由很多棵決策樹一棵一棵修正前一棵的錯誤組成。", "like": "一群學生輪流答題，每個人專門補前一個人答錯的地方。", "here": ""}, {"t": "隨機森林 Random Forest", "p": ["Random Forest", "RandomForest", "隨機森林"], "plain": "由很多棵決策樹「投票」決定答案的模型。", "like": "請 100 個人各自判斷，再看多數人怎麼說。", "here": ""}, {"t": "羅吉斯迴歸 Logistic Regression", "p": ["Logistic Regression", "Logistic 迴歸"], "plain": "最基本的分類模型，用一條直線（或平面）把兩類分開。", "like": "", "here": ""}, {"t": "編碼方式 Encoding", "p": ["One hot encoding", "One hot Encoding", "One Hot Encoding", "one hot encoding", "Label Encoding", "Label encoding", "label encoding", "Target Encoding", "Target encoding", "target encoding"], "plain": "把文字類別轉成數字，模型才能用。One-hot 是每個類別一個 0/1 欄位；Label 是依順序編 0、1、2…；Target 是用該類別的平均成交率當數字。", "like": "把「L1～L5 忠誠度」變成數字，可以是五個勾選框（One-hot）、1 到 5 分（Label），或每一級的成交率（Target）。", "here": ""}, {"t": "AutoEncoder", "p": ["AutoEncoder"], "plain": "一種神經網路，先把資料壓縮成少數幾個數字，再試著還原；壓縮後的數字可以當成精簡版的線索。", "like": "把一篇文章濃縮成三句摘要，再從摘要寫回文章。", "here": "作者用它壓縮商品資訊和 DFS 線索，結果預測反而變差。"}, {"t": "PCA 主成分分析", "p": ["PCA"], "plain": "把彼此相關的多個欄位，轉成互不相關的幾個新欄位。", "like": "", "here": ""}, {"t": "Learning Curve 學習曲線", "p": ["Learning Curve", "Learning curve", "learning curve"], "plain": "逐步增加訓練資料量，畫出練習成績和考試成績的變化，用來診斷模型的問題。", "like": "看學生做 10 題、50 題、100 題練習後，模擬考成績怎麼變。", "here": ""}, {"t": "偏差與變異 Bias / Variance", "p": ["Bias", "Variance", "Variances", "High bias", "High variance"], "plain": "偏差＝模型本身太簡單、一直猜偏；變異＝模型太敏感、換一批資料答案就大變。分別對應欠擬合與過擬合。", "like": "偏差像射箭一直偏左；變異像每箭落點都不一樣。", "here": ""}, {"t": "Epoch 訓練輪數", "p": ["Epoch", "Epcoh", "epoch"], "plain": "模型把全部訓練資料看過一遍叫一個 epoch。", "like": "把整本講義從頭讀完一次。", "here": "作者都挑「測試 F1 最高的那一輪」報告，等於用期末考挑成績。"}, {"t": "金管會健全保險商品結構規範", "p": ["健全保險商品結構規範"], "plain": "2020 年 7 月起實施的保險新規定，壓縮了儲蓄險的利率空間，很多儲蓄險因此停售。", "like": "", "here": "造成 2020 年 5 月搶買、7 月之後購買量跌到新低，是保險案例資料集偏移的主因。"}, {"t": "儲蓄險", "p": ["儲蓄險"], "plain": "兼具保障和存錢功能的保險，到期可以領回比繳的保費更多的錢。", "like": "", "here": ""}, {"t": "警示帳戶", "p": ["警示帳戶"], "plain": "被警方列為疑似詐騙或洗錢用途的銀行帳戶。在資料中非常少，是洗錢偵測要抓的目標。", "like": "", "here": ""}, {"t": "配對交易", "p": ["配對交易"], "plain": "找兩支平常走勢綁在一起的股票，價差拉開時買便宜的、賣貴的，等價差回到正常時獲利。", "like": "兩個總是並肩走的朋友，一個突然走快了，你賭他會放慢腳步回到朋友身邊。", "here": ""}, {"t": "價差過程／共整合", "p": ["價差過程", "共整合"], "plain": "兩支股票的（加權）價格差隨時間的變化。若兩支股票「共整合」，價差會在一個範圍內來回擺動、不會越拉越遠。", "like": "用繩子綁在一起的兩隻狗，可以各自亂跑，但距離不會超過繩子長度。", "here": ""}, {"t": "WGAN", "p": ["WGAN"], "plain": "一種生成對抗網路，可以「生成」看起來像真的資料；這裡用來補足資料很少的警示帳戶。", "like": "", "here": ""}, {"t": "訓練集／驗證集／測試集", "p": ["訓練集", "驗證集", "測試集", "Validation", "training set", "test set"], "plain": "資料分三份：訓練集給模型練習，驗證集用來調整設定，測試集藏到最後才拿來考試。", "like": "訓練集是練習題、驗證集是模擬考、測試集是期末考。期末考的題目一旦被拿來調整做法，分數就不準了。", "here": ""}, {"t": "過擬合 Overfitting", "p": ["overfitting", "Overfitting", "過擬合"], "plain": "模型把練習題背得太熟，換了新題目就不會。", "like": "死背考古題的學生，題目一改就答不出來。", "here": ""}, {"t": "欠擬合 Underfitting", "p": ["underfitting", "Underfitting", "欠擬合", "擬合不足"], "plain": "模型連練習題都沒學好，通常是線索太少或方法太簡單。", "like": "只讀了課本第一章就上考場。", "here": ""}, {"t": "資料洩漏 Data leakage", "p": ["資料洩漏", "data leakage", "洩漏"], "plain": "訓練或調整模型時，不小心用到了「考試時才會知道」的資訊，讓分數看起來比實際好。", "like": "考前偷看到考卷，分數很高，但不代表真的會。", "here": ""}, {"t": "超參數 Hyperparameter", "p": ["超參數", "hyperparameter", "hyperparameters"], "plain": "模型開始學習之前，由人先決定好的設定，例如要學幾輪、視窗多長。", "like": "烤蛋糕前要先決定的溫度和時間；蛋糕本身是模型學出來的。", "here": ""}]};</script>
+<script>
+/* 閱讀輔助：回到最上面、目錄醒目提示、名詞小卡、段落預覽抽屜、閱讀進度記憶
+   所有記錄只存在這台電腦的瀏覽器（localStorage），不會上傳。 */
+(function () {
+  var C = window.READER_CONFIG || {};
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  /* ---------- 1. 回到最上面 ---------- */
+  var topBtn = document.createElement('button');
+  topBtn.id = 'rd-top'; topBtn.type = 'button'; topBtn.setAttribute('aria-label', '回到最上面');
+  topBtn.innerHTML = '↑<span>頂端</span>';
+  document.body.appendChild(topBtn);
+  topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  function onTop() { topBtn.classList.toggle('show', window.scrollY > 500); }
+  window.addEventListener('scroll', onTop, { passive: true }); onTop();
+  if (C.mode === 'index') return;
+
+  /* ---------- 2. 目錄醒目提示（白話導讀頁） ---------- */
+  if (C.mode === 'intro' && 'IntersectionObserver' in window) {
+    var tocLinks = $$('nav.toc a'), tocMap = {};
+    tocLinks.forEach(function (a) { tocMap[a.getAttribute('href').slice(1)] = a; });
+    var tocIO = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach(function (l) { l.classList.remove('on'); });
+        var a = tocMap[e.target.id];
+        if (a) { a.classList.add('on'); var bar = a.parentNode; bar.scrollLeft = a.offsetLeft - (bar.clientWidth - a.offsetWidth) / 2; }
+      });
+    }, { rootMargin: '-70px 0px -70% 0px' });
+    tocLinks.forEach(function (a) { var s = document.getElementById(a.getAttribute('href').slice(1)); if (s) tocIO.observe(s); });
+  }
+
+  /* ---------- 3. 名詞小卡＋¶ 段號自動變連結 ---------- */
+  var G = C.glossary || [];
+  var pats = [];
+  G.forEach(function (g, i) { g.p.forEach(function (p) { pats.push({ p: p, i: i }); }); });
+  pats.sort(function (a, b) { return b.p.length - a.p.length; });
+  var lookup = {};
+  pats.forEach(function (x) { if (!(x.p in lookup)) lookup[x.p] = x.i; });
+  function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  var RE = null;
+  function buildRe(lookbehind) {
+    return new RegExp(pats.map(function (x) {
+      var e = escRe(x.p);
+      if (!/^[A-Za-z0-9]/.test(x.p)) return e;
+      return (lookbehind ? '(?<![A-Za-z0-9-])' : '') + e + '(?![A-Za-z0-9])';
+    }).join('|'), 'g');
+  }
+  if (pats.length) { try { RE = buildRe(true); } catch (err) { RE = buildRe(false); } }   // 舊版 Safari 不支援 lookbehind
+  var SKIP = 'a,button,code,.pno,.chip,dt,h2,h3,h4,summary,.src-tag,.tbl-lbl,.ab-lbl,script,style';
+
+  function enhance(root, opt) {
+    var used = {};
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        var p = n.parentElement;
+        return (!p || p.closest(SKIP)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
+    nodes.forEach(function (n) {
+      var s = n.nodeValue, hits = [], m;
+      if (RE) {
+        RE.lastIndex = 0;
+        while ((m = RE.exec(s))) {
+          var gi = lookup[m[0]];
+          if (gi != null && !used[gi]) { used[gi] = 1; hits.push({ i: m.index, len: m[0].length, g: gi, txt: m[0] }); }
+        }
+      }
+      if (opt.refOk) {
+        var r = /¶(\d+)/g;
+        while ((m = r.exec(s))) if (opt.refOk(m[1])) hits.push({ i: m.index, len: m[0].length, ref: m[1], txt: m[0] });
+      }
+      if (!hits.length) return;
+      hits.sort(function (a, b) { return a.i - b.i; });
+      var f = document.createDocumentFragment(), pos = 0;
+      hits.forEach(function (h) {
+        if (h.i < pos) return;
+        f.appendChild(document.createTextNode(s.slice(pos, h.i)));
+        if (h.ref) {
+          var a = document.createElement('a'); a.className = 'rd-ref';
+          a.href = (opt.refBase || '') + '#p' + h.ref; a.textContent = h.txt; f.appendChild(a);
+        } else {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'rd-term';
+          b.setAttribute('data-g', h.g); b.textContent = h.txt; f.appendChild(b);
+        }
+        pos = h.i + h.len;
+      });
+      f.appendChild(document.createTextNode(s.slice(pos)));
+      n.parentNode.replaceChild(f, n);
+    });
+  }
+  if (C.mode === 'paper') {
+    $$('article.row').forEach(function (row) {
+      enhance(row, { refOk: function (n) { return !!document.getElementById('p' + n); } });
+    });
+  }
+
+  var pop = document.createElement('div');
+  pop.id = 'rd-pop'; pop.setAttribute('role', 'dialog'); pop.hidden = true;
+  document.body.appendChild(pop);
+  function showTerm(btn) {
+    var g = G[+btn.getAttribute('data-g')]; if (!g) return;
+    pop.innerHTML = '<button class="x" type="button" aria-label="關閉">✕</button><b>' + g.t + '</b><p>' + g.plain + '</p>' +
+      (g.like ? '<p class="like">' + g.like + '</p>' : '') + (g.here ? '<p class="here">' + g.here + '</p>' : '');
+    pop.hidden = false;
+    if (window.innerWidth < 600) { pop.className = 'sheet'; pop.style.cssText = ''; return; }
+    pop.className = '';
+    var r = btn.getBoundingClientRect(), W = Math.min(380, window.innerWidth - 24);
+    pop.style.width = W + 'px';
+    pop.style.left = Math.min(Math.max(12, r.left), window.innerWidth - W - 12) + 'px';
+    var h = pop.offsetHeight, y = r.bottom + 8;
+    if (y + h > window.innerHeight - 12) y = Math.max(12, r.top - h - 8);
+    pop.style.top = y + 'px';
+  }
+
+  /* ---------- 4. 段落預覽抽屜 ---------- */
+  var ov = document.createElement('div'); ov.id = 'rd-ov'; ov.hidden = true;
+  var dr = document.createElement('aside');
+  dr.id = 'rd-peek'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-modal', 'true'); dr.setAttribute('aria-label', '段落預覽'); dr.hidden = true;
+  dr.innerHTML = '<div class="hd"><span class="tt"></span><a class="go" href="#">跳到這段 →</a><button class="x" type="button" aria-label="關閉預覽">✕</button></div><div class="bd"></div>';
+  document.body.appendChild(ov); document.body.appendChild(dr);
+  var remoteDoc = null, lastFocus = null;
+
+  function getRow(src, n) {
+    if (!src) return Promise.resolve(document.getElementById('p' + n));
+    if (remoteDoc) return Promise.resolve(remoteDoc.getElementById('p' + n));
+    return fetch(src).then(function (r) { if (!r.ok) throw new Error('fetch'); return r.text(); })
+      .then(function (t) { remoteDoc = new DOMParser().parseFromString(t, 'text/html'); return remoteDoc.getElementById('p' + n); });
+  }
+  function rowLabel(row) {
+    var p = row.querySelector('.pno'); if (!p) return '';
+    var id = p.querySelector('.id') ? p.querySelector('.id').textContent : '';
+    var txt = Array.prototype.filter.call(p.childNodes, function (c) { return c.nodeType === 3; }).map(function (c) { return c.textContent; }).join('').trim();
+    return (id + ' ' + txt).trim();
+  }
+  function openPeek(src, n, href) {
+    getRow(src, n).then(function (row) {
+      if (!row) { location.href = href; return; }
+      var c = row.cloneNode(true);
+      c.removeAttribute('id');
+      Array.prototype.forEach.call(c.querySelectorAll('[id]'), function (e) { e.removeAttribute('id'); });
+      if (src) enhance(c, { refOk: function (k) { return !!remoteDoc.getElementById('p' + k); }, refBase: src });
+      dr.querySelector('.tt').textContent = rowLabel(row) || ('¶' + n);
+      var go = dr.querySelector('.go'); go.href = href; go.textContent = src ? '在批注頁打開 →' : '跳到這段位置 →';
+      var bd = dr.querySelector('.bd'); bd.innerHTML = ''; bd.appendChild(c); bd.scrollTop = 0;
+      if (dr.hidden) {
+        lastFocus = document.activeElement;
+        ov.hidden = false; dr.hidden = false; document.documentElement.classList.add('rd-lock');
+        requestAnimationFrame(function () { dr.classList.add('open'); });
+      }
+      dr.querySelector('.x').focus();
+    }).catch(function () { location.href = href; });
+  }
+  function closePeek() {
+    if (dr.hidden) return;
+    dr.classList.remove('open'); ov.hidden = true; pop.hidden = true;
+    document.documentElement.classList.remove('rd-lock');
+    setTimeout(function () { dr.hidden = true; }, 220);
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var term = t.closest('.rd-term');
+    if (term) { e.preventDefault(); showTerm(term); return; }
+    if (t.closest('#rd-pop .x')) { pop.hidden = true; return; }
+    if (!pop.hidden && !t.closest('#rd-pop')) pop.hidden = true;
+    if (t.closest('#rd-peek .x') || t === ov) { closePeek(); return; }
+    if (t.closest('#rd-peek .go')) { closePeek(); return; }   // 讓連結照常跳轉
+    var a = t.closest('a[href]'); if (!a || a.closest('nav')) return;
+    var href = a.getAttribute('href'), m;
+    if (C.mode === 'paper' && (m = href.match(/^#p(\d+)$/))) { e.preventDefault(); openPeek(null, m[1], href); return; }
+    if (C.peekSrc && (m = href.match(/^(.*)#p(\d+)$/)) && m[1] === C.peekSrc) { e.preventDefault(); openPeek(C.peekSrc, m[2], href); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!pop.hidden) { pop.hidden = true; return; }
+    closePeek();
+  });
+
+  /* ---------- 5. 閱讀進度記憶 ---------- */
+  if (!('IntersectionObserver' in window)) return;
+  var PK = 'rd-progress:' + location.pathname;
+  var targets = C.mode === 'paper' ? $$('section.guide, article.row, section.map') : $$('main section[id]');
+  function labelOf(el) {
+    if (el.matches('article.row')) return rowLabel(el);
+    var h = el.querySelector('h2'); return h ? h.textContent.replace(/\s+/g, ' ').trim() : '';
+  }
+  var cur = null;
+  var pio = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) cur = e.target; });
+  }, { rootMargin: '-80px 0px -60% 0px' });
+  targets.forEach(function (t) { pio.observe(t); });
+  var tm = null;
+  window.addEventListener('scroll', function () {
+    clearTimeout(tm);
+    tm = setTimeout(function () {
+      if (cur && cur.id && window.scrollY > 300) store.set(PK, { id: cur.id, label: labelOf(cur), t: Date.now() });
+    }, 600);
+  }, { passive: true });
+
+  var saved = store.get(PK);
+  if (saved && saved.id && !location.hash) {
+    var el = document.getElementById(saved.id);
+    if (el && el !== targets[0]) {
+      var days = Math.floor((Date.now() - (saved.t || Date.now())) / 86400000);
+      var when = days <= 0 ? '今天' : days === 1 ? '昨天' : days + ' 天前';
+      var d = document.createElement('div'); d.id = 'rd-toast'; d.setAttribute('role', 'status');
+      d.innerHTML = '<span class="msg">' + when + '讀到 <b></b></span><button class="go" type="button">從這裡繼續</button><button class="x" type="button" aria-label="關閉">✕</button>';
+      d.querySelector('b').textContent = saved.label || '';
+      document.body.appendChild(d);
+      d.querySelector('.go').addEventListener('click', function () { el.scrollIntoView({ block: 'start' }); d.remove(); });
+      d.querySelector('.x').addEventListener('click', function () { d.remove(); });
+      setTimeout(function () { d.classList.add('show'); }, 400);
+      setTimeout(function () { if (d.parentNode && window.scrollY > 600) d.remove(); }, 15000);
+    }
+  }
+})();
+
 </script>
 </body>
 </html>
