@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>白話導讀：自動特徵生成</title>
+<meta name="description" content="不需要統計、機器學習、財金背景，用故事和比喻讀懂《自動特徵生成方法與資料集偏移問題於財務機器學習模型探討》。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#14213d; --navy-2:#22325a; --paper:#faf7f0; --card:#fffdf8; --ink:#2b2924; --muted:#706a5c; --line:#ddd5c3;
+  --y:#fff0a3; --y-b:#d9a800; --y-bg:#fffaf0;
+  --r-b:#c4402c; --r-bg:#fdf3f1;
+  --b-b:#2c6db3; --b-bg:#f2f7fd;
+  --g-b:#358a45; --g-bg:#f2f9f2;
+  --p-b:#7449b0; --p-bg:#f7f2fd;
+  --ui:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16.5px;line-height:1.9;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+a{color:var(--navy)}
+
+header{background:var(--navy);color:#e9ecf3;padding:30px 0 28px}
+header .home{color:#cdd3e2;text-decoration:none;font-size:13.5px;border-bottom:1px dotted rgba(255,255,255,.35)}
+header .kicker{font-size:12px;letter-spacing:.16em;opacity:.65;margin-top:16px}
+header h1{font-family:"Noto Serif TC",serif;font-size:clamp(24px,4vw,32px);line-height:1.45;margin:6px 0 8px}
+header p{margin:0;opacity:.85;font-size:15px}
+header .go{display:inline-block;margin-top:14px;background:#fff;color:var(--navy);text-decoration:none;font-weight:600;font-size:14px;padding:8px 14px;border-radius:7px}
+
+nav.toc{position:sticky;top:0;z-index:10;background:var(--navy-2)}
+nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
+nav.toc .wrap::-webkit-scrollbar{display:none}
+nav.toc a{flex:none;color:#cdd3e2;text-decoration:none;font-size:13.5px;padding:5px 11px;border-radius:6px;white-space:nowrap}
+nav.toc a:hover{background:rgba(255,255,255,.1);color:#fff}
+
+section{padding:34px 0 6px}
+h2{font-family:"Noto Serif TC",serif;font-size:24px;line-height:1.5;margin:0 0 6px;display:flex;gap:12px;align-items:baseline}
+h2 .n{font:600 13px var(--ui);color:#fff;background:var(--navy);border-radius:6px;padding:3px 9px;flex:none;position:relative;top:-3px}
+.lead{color:var(--muted);margin:0 0 18px;font-size:15px}
+h3{font-size:18px;margin:26px 0 8px}
+
+.howto{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-top:26px}
+.howto ol{margin:6px 0 0;padding-left:22px}
+
+.three{display:grid;gap:12px}
+.three div{background:#fff;border:1px solid var(--line);border-left:5px solid var(--c);border-radius:0 10px 10px 0;padding:14px 18px}
+.three b{display:block;font-size:13px;letter-spacing:.08em;color:var(--c)}
+
+.concept{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+.concept h3{margin:0 0 6px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.concept h3 small{font:500 13px var(--ui);color:var(--muted)}
+.concept .plain{margin:0 0 10px}
+.concept .like{background:var(--y-bg);border-left:4px solid var(--y-b);border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0;font-size:15.5px}
+.concept .here{background:var(--b-bg);border-left:4px solid var(--b-b);border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0 0;font-size:15.5px}
+.concept .like::before{content:"🍎 生活比喻　";font-weight:600;color:#8a6a00}
+.concept .here::before{content:"📄 在這篇論文裡　";font-weight:600;color:#23476f}
+.group-label{font:600 12.5px var(--ui);letter-spacing:.1em;color:var(--muted);margin:30px 0 4px;text-transform:uppercase}
+
+.story{position:relative;margin:10px 0 0;padding-left:28px}
+.story::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:3px;background:var(--line);border-radius:2px}
+.act{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:0 0 16px}
+.act::before{content:attr(data-n);position:absolute;left:-30px;top:16px;width:24px;height:24px;border-radius:50%;background:var(--c,var(--navy));color:#fff;font:600 13px/24px var(--ui);text-align:center}
+.act h3{margin:0 0 4px;font-size:17.5px}
+.act p{margin:6px 0}
+.num{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 2px}
+.num span{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:14.5px}
+.num b{font-size:17px;color:var(--navy)}
+.feel{font-size:15px;color:var(--muted)}
+
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.case{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:10px;padding:14px 16px;font-size:15px;line-height:1.8}
+.case b{display:block;font-size:16px;margin-bottom:4px}
+.case .res{display:inline-block;margin-top:6px;font-size:13px;font-weight:600;color:var(--c)}
+
+.but{display:grid;gap:12px}
+.but div{background:var(--r-bg);border-left:5px solid var(--r-b);border-radius:0 10px 10px 0;padding:14px 18px}
+.but b{display:block}
+
+.route{counter-reset:r;list-style:none;padding:0;margin:10px 0 0}
+.route li{counter-increment:r;position:relative;padding:10px 14px 10px 50px;background:#fff;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+.route li::before{content:counter(r);position:absolute;left:14px;top:11px;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font:600 13px/24px var(--ui);text-align:center}
+.route a{font-weight:600}
+
+details{background:#fff;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+details summary{cursor:pointer;padding:12px 16px;font-weight:600}
+details div{padding:0 16px 14px}
+.review{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+.review div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;text-align:center}
+.review b{display:block;font-size:18px;color:var(--navy)}
+
+footer{color:var(--muted);font-size:13px;text-align:center;padding:40px 0 50px;line-height:1.8}
+@media (max-width:700px){
+  .wrap{padding:0 16px}
+  .cases,.review{grid-template-columns:1fr}
+  body{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="home" href="../index.html">← 回論文批注首頁</a>
+    <div class="kicker">白話導讀 · 給第一次讀這篇的人</div>
+    <h1>用 30 分鐘讀懂：<br>《自動特徵生成方法與資料集偏移問題於財務機器學習模型探討》</h1>
+    <p>白建濠（2022）國立陽明交通大學 財務金融碩士班 · 不需要統計、機器學習、財金背景</p>
+    <a class="go" href="2022-auto-feature-dataset-shift.html">讀完這頁，再去看雙欄批注 →</a>
+  </div>
+</header>
+
+<nav class="toc" aria-label="導讀目錄">
+  <div class="wrap">
+    <a href="#s0">一分鐘版本</a>
+    <a href="#s1">先修觀念</a>
+    <a href="#s2">論文的故事</a>
+    <a href="#s3">三個案例</a>
+    <a href="#s4">要打個問號的地方</a>
+    <a href="#s5">接下來怎麼讀</a>
+    <a href="#s6">記住它</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<div class="howto">
+  <b>這頁怎麼用</b>
+  <ol>
+    <li>從上到下讀一次就好，大約 30 分鐘。<b>不用記任何公式</b>，這頁也沒有公式。</li>
+    <li>每讀完一節，<b>闔上眼睛，用自己的話說一遍</b>那一節在講什麼。說不出來就回頭再看一次那一節。</li>
+    <li>全部讀完後，再去看雙欄批注頁。那時候你會發現，原本看不懂的段落已經有地方可以「掛」了。</li>
+  </ol>
+</div>
+
+<!-- ============ 0 ============ -->
+<section id="s0">
+  <h2><span class="n">0</span>一分鐘版本</h2>
+  <p class="lead">先把整篇濃縮成三句話。之後讀到任何細節，都可以問自己：「這是在講三句話中的哪一句？」</p>
+  <div class="three">
+    <div style="--c:var(--r-b)"><b>問題</b>用電腦從過去的資料學規則、預測未來時，常常會「練習時很準，真的上場卻不準」。原因之一是<b>過去和未來的資料長得不一樣</b>；另一個原因是<b>給電腦的線索不夠多</b>。</div>
+    <div style="--c:var(--p-b)"><b>做法</b>先用程式<b>自動產生大量新線索</b>（解決線索不夠），再用一個統計檢查<b>把「過去和未來長得不一樣」的線索丟掉</b>（解決資料不一樣）。</div>
+    <div style="--c:var(--g-b)"><b>結果</b>在洗錢帳戶和配對交易兩個案例上有效；在保險案例上一開始無效，作者發現是因為<b>2020 年的保險新法規</b>改變了民眾的購買行為。避開法規期間之後，方法就有效了。</div>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+  <h2><span class="n">1</span>先修觀念：讀這篇之前要懂的 11 件事</h2>
+  <p class="lead">依照「先懂這個，下一個才看得懂」的順序排列。每個觀念都有三層：一句白話、一個生活比喻、它在這篇論文裡扮演什麼角色。</p>
+
+  <div class="group-label">A · 機器學習在做什麼</div>
+  <div class="concept">
+    <h3>① 機器學習 <small>Machine Learning</small></h3>
+    <p class="plain">給電腦看大量「過去的例子和答案」，讓它自己找出規律，再拿去猜新的例子。</p>
+    <p class="like">補習班老師看過幾千個學生的成績和錄取結果，慢慢抓到「模擬考幾分、哪科強的人通常會上」，再拿這個經驗去猜今年的學生。</p>
+    <p class="here">要猜的是：<b>一張保單會不會成交</b>、<b>一個銀行帳戶是不是洗錢帳戶</b>、<b>一組股票該怎麼交易</b>。主要用的「學生」是一種叫 <b>XGBoost</b> 的模型，你可以先把它當成一個很會做選擇題的學生。</p>
+  </div>
+  <div class="concept">
+    <h3>② 特徵 <small>Feature</small></h3>
+    <p class="plain">電腦用來猜答案的「線索」。</p>
+    <p class="like">醫生判斷你是不是感冒，看的是體溫、咳嗽、喉嚨痛——這些就是特徵。</p>
+    <p class="here">保險案例的特徵像是：被保人年齡、保費、保額、買的是哪種保險、客戶忠誠度、<b>業務員的年資和性別</b>。整篇論文其實都在討論「線索要怎麼準備、哪些線索該留、哪些該丟」，這件事叫做<b>特徵工程</b>。</p>
+  </div>
+  <div class="concept">
+    <h3>③ 訓練集與測試集 <small>Training set / Test set</small></h3>
+    <p class="plain">把資料分兩份：一份給電腦練習（訓練集），另一份藏起來，最後才拿來考它（測試集）。</p>
+    <p class="like">訓練集是平常寫的練習題，測試集是期末考。如果期末考題目事先被看過，分數就不能代表真實程度。</p>
+    <p class="here">作者依<b>時間</b>切：2018/9～2020/4 當練習題，2020/5～2020/9 當期末考。用「過去」預測「未來」，這個做法是正確的。</p>
+  </div>
+  <div class="concept">
+    <h3>④ 過擬合與欠擬合 <small>Overfitting / Underfitting</small></h3>
+    <p class="plain">過擬合＝把練習題背得滾瓜爛熟，但換題目就不會；欠擬合＝連練習題都沒學好，因為資訊太少或方法太簡單。</p>
+    <p class="like">過擬合像死背考古題的學生；欠擬合像只讀了課本第一章就上考場的學生。</p>
+    <p class="here">作者診斷他的模型<b>兩種問題都有</b>，所以開了兩帖藥：用 DFS 增加線索治「欠擬合」，用 KS 檢定丟掉壞線索治他認為的「過擬合」。</p>
+  </div>
+
+  <div class="group-label">B · 怎麼評分</div>
+  <div class="concept">
+    <h3>⑤ F1 分數 <small>F1 Score</small></h3>
+    <p class="plain">0 到 1 之間的分數，專門衡量「少數但重要的那一類，有沒有被抓到、抓得準不準」。越接近 1 越好。</p>
+    <p class="like">100 張保單只有 15 張成交。如果電腦偷懶全部猜「不會成交」，正確率還有 85%——看起來很高，其實一張成交的都沒抓到。F1 就是為了揪出這種偷懶而設計的分數。</p>
+    <p class="here">整篇論文都用 F1 比較好壞。<b>保險案例的 F1 大約在 0.3～0.4</b>，所以看到「從 0.381 進步到 0.409」這種數字，要知道這是在很低的起點上小幅進步。</p>
+  </div>
+  <div class="concept">
+    <h3>⑥ 資料不平衡 <small>Imbalanced data</small></h3>
+    <p class="plain">某一類的資料特別少，電腦就容易忽略它。解法是把少數類的「份量」調高。</p>
+    <p class="like">班上 85 個人說要吃麥當勞、15 個人說要吃壽司。如果每人一票，壽司永遠選不上；所以讓壽司組每人算 5.4 票。</p>
+    <p class="here">成交保單 79,159 張、未成交 427,462 張，比例大約 1：5.4。作者試了兩種方法：<b>把成交保單複製到一樣多</b>（過採樣），或<b>讓每張成交保單算 5.4 倍重</b>（加權）。兩種都讓 F1 從 0.21 跳到 0.37～0.39，這是全文效果最明顯的一步。</p>
+  </div>
+
+  <div class="group-label">C · 這篇的主角：資料集偏移</div>
+  <div class="concept">
+    <h3>⑦ 分佈 <small>Distribution</small></h3>
+    <p class="plain">一群數字「長什麼樣子」：大部分集中在哪裡、分散得多開。</p>
+    <p class="like">把全班身高畫成長條圖，A 班集中在 160～170 公分，B 班集中在 170～180 公分，這兩班的身高「分佈」就不一樣。</p>
+    <p class="here">作者關心的是：同一條線索（例如保費），在練習期和考試期的分佈是不是一樣。</p>
+  </div>
+  <div class="concept">
+    <h3>⑧ 資料集偏移 <small>Dataset shift</small></h3>
+    <p class="plain">練習時的資料和上場時的資料長得不一樣，學到的規則就不管用了。</p>
+    <p class="like">整學期都練選擇題，期末考卻全部是申論題。你不是不認真，而是題型變了。</p>
+    <p class="here">保險案例的期末考期間（2020/5～9），剛好碰上<b>金管會 2020 年 7 月的新規定</b>：儲蓄險的條件變差、很多商品要停賣。所以 5 月大家搶著買、7 月之後幾乎沒人買。練習期學到的「什麼樣的保單會成交」，到了考試期就不準了。</p>
+  </div>
+  <div class="concept">
+    <h3>⑨ KS 檢定與 p 值 <small>Kolmogorov-Smirnov test / p-value</small></h3>
+    <p class="plain">KS 檢定用來比較兩堆資料的分佈像不像；p 值告訴你「這個差異會不會只是巧合」。<b>p 值越小，越不像巧合</b>，也就是兩邊真的不一樣。</p>
+    <p class="like">把 A 班和 B 班的身高長條圖疊在一起，看兩條曲線最遠差多少。差很多、而且不太可能是運氣造成的，p 值就會很小。</p>
+    <p class="here">作者對每一條線索都做 KS 檢定，<b>p 值接近 0 的就丟掉</b>，因為代表它在練習期和考試期長得不一樣，留著反而會誤導電腦。這是全文最核心的想法。</p>
+  </div>
+  <div class="concept">
+    <h3>⑩ 判別式學習 <small>Discriminative learning（又叫對抗驗證）</small></h3>
+    <p class="plain">另外請一個電腦「偵探」，猜每一筆資料是來自練習期還是考試期。猜得越準，代表兩期差越多。</p>
+    <p class="like">把兩班學生混在一起，請人只看身高猜他是哪一班。如果一猜就中，代表兩班身高差很多；如果怎麼猜都像丟銅板，代表兩班差不多。</p>
+    <p class="here">偵探的分數也用 F1：<b>1.0 代表完全分得出來（偏移很嚴重）</b>，越低代表兩期越像。作者用它來驗證「丟掉線索之後，兩期是不是變得比較像了」。</p>
+  </div>
+
+  <div class="group-label">D · 自動產生線索</div>
+  <div class="concept">
+    <h3>⑪ DFS 深度特徵合成 <small>Deep Feature Synthesis</small></h3>
+    <p class="plain">當資料分散在好幾張相關的表格時，程式自動把表格串起來，用加總、平均、最新一筆等方式，算出大量新的線索。</p>
+    <p class="like">你有「訂單表」「客戶表」「業務員表」。程式會自動算出「這位客戶總共買了多少」「這位業務員平均每張單多少錢」「這位客戶最近一次改保單是哪一年」——這些都是人工可能想不到的新線索。</p>
+    <p class="here">保險案例用客戶、業務員、保單三張表，<b>自動產生了 1,242 個新線索</b>。這是作者用來治「欠擬合」的藥。</p>
+  </div>
+
+  <div class="group-label">E · 財金背景（三個案例）</div>
+  <div class="concept">
+    <h3>保單成交、警示帳戶、配對交易</h3>
+    <p class="plain"><b>保單成交：</b>業務員提出一份保險建議書，客戶最後有沒有買。<br><b>警示帳戶：</b>被警方列為疑似詐騙或洗錢用途的銀行帳戶，數量非常少。<br><b>配對交易：</b>找兩支平常走勢綁在一起的股票，當兩者價差突然拉開，就買便宜的、賣貴的，等價差回到正常時獲利。</p>
+    <p class="like">配對交易就像兩個總是並肩走路的朋友：其中一個突然走快了，你就賭他等一下會放慢腳步、回到朋友身邊。</p>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+  <h2><span class="n">2</span>論文的故事：保險案例的五幕劇</h2>
+  <p class="lead">74 頁裡大部分篇幅都在講保險案例。把它想成一齣五幕劇，每一幕只記一個重點和一個數字就夠了（F1 越高越好，最高是 1）。</p>
+  <div class="story">
+    <div class="act" data-n="1" style="--c:var(--b-b)">
+      <h3>先做出能用的模型</h3>
+      <p>成交保單太少，電腦一開始幾乎都猜「不會成交」。作者把成交保單的份量調高後，分數大幅改善。</p>
+      <div class="num"><span>沒處理 <b>0.21</b></span><span>複製成交保單 <b>0.37</b></span><span>加權 5.4 倍 <b>0.39</b></span></div>
+      <p class="feel">→ 全文效果最明顯、也最沒有爭議的一步。</p>
+    </div>
+    <div class="act" data-n="2" style="--c:var(--b-b)">
+      <h3>人工加線索，只有一點點進步</h3>
+      <p>作者加入業務員的年資、性別，以及「年資以外的工作經驗」，也試了各種把客戶等級變成數字的方法，還試著把商品資訊壓縮。</p>
+      <div class="num"><span>加業務員資訊 <b>0.368 → 0.386</b></span><span>各種編碼方式 <b>差不到 0.006</b></span><span>壓縮商品資訊 <b>反而降到 0.31</b></span></div>
+      <p class="feel">→ 人工想線索效果有限，這替後面「自動產生線索」鋪路。</p>
+    </div>
+    <div class="act" data-n="3" style="--c:var(--r-b)">
+      <h3>發現：練習題和期末考長得不一樣</h3>
+      <p>KS 檢定顯示，幾乎每一群客戶的年齡、保費、保額，在練習期和考試期的分佈都不一樣；偵探也能大致分出兩期的資料。</p>
+      <div class="num"><span>KS 的 p 值 <b>幾乎全部 ≈ 0</b></span><span>偵探分辨的 F1 <b>0.69</b></span></div>
+      <p class="feel">→ 證實有「資料集偏移」。</p>
+    </div>
+    <div class="act" data-n="4" style="--c:var(--r-b)">
+      <h3>照計畫丟掉壞線索，結果反而變差</h3>
+      <p>作者用 KS 丟掉分佈不一樣的線索，預測卻變差了。他去查原因，發現 2020 年 5 月有搶買儲蓄險的熱潮、7 月新規上路後購買量跌到新低——<b>考試期本身就因為法規而變了樣</b>。</p>
+      <div class="num"><span>丟掉線索後 <b>0.378 → 0.344</b></span></div>
+      <p class="feel">→ 這是全文的轉折點：方法不是萬靈丹，遇到法規這種「突然的改變」會失效。</p>
+    </div>
+    <div class="act" data-n="5" style="--c:var(--g-b)">
+      <h3>先補線索，再避開法規期：終於有效</h3>
+      <p>作者先用 DFS 自動產生 1,242 個新線索，分數提高了。接著把資料限制在法規出現之前（2018/9～2020/4），重新切練習與考試期，再用 KS 丟掉壞線索——這次預測變好，偵探也比較分不出兩期了。</p>
+      <div class="num"><span>只用原本線索 <b>0.351</b></span><span>加 DFS <b>0.393</b></span><span>加 DFS 再用 KS <b>0.418</b></span><span>偵探 F1 <b>1.0 → 0.535</b></span></div>
+      <p class="feel">→ 全文最重要的證據：在「沒有突然改變」的期間，先補線索、再丟壞線索，是有用的。</p>
+    </div>
+  </div>
+  <p style="margin-top:4px">另外還有一個小支線：作者測試了一種會「自動調整樣本份量」的進階方法（Khan 等人提出），結果<b>不如最簡單的 5.4 倍加權</b>，所以作者主張「照數量比例加權」就夠了。</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+  <h2><span class="n">3</span>三個案例的結果，一張圖看完</h2>
+  <p class="lead">作者用三個不同的財金問題測試同一套方法，想證明它不是只在某一份資料上剛好有效。</p>
+  <div class="cases">
+    <div class="case" style="--c:#c4402c"><b>保險：保單會不會成交</b>台灣某保險公司 2018～2020 年、約 50 萬張保單。<br><span class="res">一開始無效 → 避開法規期後有效</span></div>
+    <div class="case" style="--c:#358a45"><b>洗錢：帳戶是不是警示帳戶</b>台灣某銀行 2018 年 4～9 月的交易紀錄。KS 剛好抓出兩個會誤導電腦的線索。<br><span class="res">有效，F1 最高約 0.80</span></div>
+    <div class="case" style="--c:#358a45"><b>配對交易：該怎麼買賣</b>台灣 50 成分股 2013～2016 年的高頻資料，比較三種線索：價差、股價、報酬。<br><span class="res">「價差」最穩定，報酬大多最高</span></div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+  <h2><span class="n">4</span>讀的時候要打個問號的地方</h2>
+  <p class="lead">懂了故事之後，下一步是「不要全信」。以下三點是這篇最值得注意的問題，也是跟教授討論時最好的切入點。</p>
+  <div class="but">
+    <div><b>① 期末考的題目，其實被偷看過</b>作者在每次訓練時，都挑「期末考分數最高的那一次」來報告。這就像考完試再回頭改答案，所以很多分數可能比真實能力高一點。</div>
+    <div><b>② 有一個實驗直接用了期末考的資料</b>為了證明 KS 有效，作者有一組實驗直接比較「練習期 vs. 考試期」來丟線索，得到 0.427。但真實情況下，我們事先不可能拿到未來的資料，所以這個數字不能當作方法有效的證據。</div>
+    <div><b>③ 「顯著進步」常常只差一點點</b>例如加入業務員資訊只從 0.368 進步到 0.386，而且每個實驗都只做一次，沒有檢查這樣的差距會不會只是運氣。</div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+  <h2><span class="n">5</span>接下來怎麼讀：先看這 8 段就好</h2>
+  <p class="lead">雙欄批注頁有 54 段，不需要全部讀。依照下面的順序，只看這 8 段（點連結會直接跳到那一段），每段先看左欄原文，再看右欄批注。</p>
+  <ol class="route">
+    <li><a href="2022-auto-feature-dataset-shift.html#p5">¶5</a>　作者怎麼定義「資料集偏移」——對照上面的觀念 ⑧</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p8">¶8</a>　作者自己預告三個案例的結果——對照第 3 節</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p30">¶30</a>　第一幕：處理資料不平衡（0.21 → 0.39）</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p36">¶36</a>　第三幕：偵探實驗，以及很聰明的「對照組」設計</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p37">¶37</a>　第四幕：KS 失效的轉折點</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p38">¶38</a>　第四幕：儲蓄險搶購與法規</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p43">¶43</a>　第五幕：全文最重要的證據</li>
+    <li><a href="2022-auto-feature-dataset-shift.html#p53">¶53</a>　作者的結論與限制</li>
+  </ol>
+  <p>讀完這 8 段，就完成了 3-Pass 讀法的「第一輪」，可以回到批注頁最上方的「3-Pass 讀法」繼續第二輪。</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+  <h2><span class="n">6</span>記住它：5 個自我檢查題</h2>
+  <p class="lead">先自己在腦中回答，再點開對照。答不出來的題目，回頭看對應的那一節。</p>
+  <details><summary>Q1　這篇想解決的兩個問題是什麼？</summary><div>(1) 過去和未來的資料長得不一樣（資料集偏移）；(2) 給電腦的線索不夠多（欠擬合）。→ 第 0 節</div></details>
+  <details><summary>Q2　KS 檢定在這篇裡用來做什麼？p 值小代表什麼？</summary><div>用來比較每條線索在練習期和考試期的分佈像不像；p 值越小，代表兩期越不一樣，作者就把這條線索丟掉。→ 觀念 ⑨</div></details>
+  <details><summary>Q3　保險案例一開始為什麼失敗？</summary><div>考試期剛好碰上 2020 年 7 月的保險新法規，5 月搶買、7 月之後幾乎不買，資料突然改變，用練習期判斷要丟哪些線索就不準了。→ 第 2 節第四幕</div></details>
+  <details><summary>Q4　全文最重要的一組數字是什麼？</summary><div>避開法規期之後：預測 F1 從 0.351 → 0.393（加 DFS）→ 0.418（再加 KS），偵探 F1 從 1.0 降到 0.535。→ 第 2 節第五幕</div></details>
+  <details><summary>Q5　這篇最值得懷疑的地方是什麼？</summary><div>挑「期末考分數最高的那一次」來報告，以及有一組實驗直接用了期末考的資料，所以部分分數可能偏高。→ 第 4 節</div></details>
+
+  <h3>間隔複習：什麼時候再回來看</h3>
+  <p>人讀完東西後，一天內會忘掉大半。只要在快忘記的時候再回想一次，就能記得久很多。不用重讀整頁，只要回答上面 5 題就好：</p>
+  <div class="review">
+    <div><b>隔天</b>回答 5 題（約 5 分鐘）</div>
+    <div><b>第 3 天</b>不看資料，用三句話講給自己聽</div>
+    <div><b>第 7 天</b>再回答 5 題，答錯的回頭看</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  本頁是依原論文內容改寫的白話導讀，數字取自原文表格；比喻是為了幫助理解，不是原文內容。<br>
+  原典：白建濠（2022），國立陽明交通大學財務金融碩士班碩士論文，指導教授戴天時。
+</footer>
+
+</body>
+</html>
