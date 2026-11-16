@@ -54,6 +54,8 @@ header p{margin:0;max-width:640px;font-size:15px;line-height:1.75;opacity:.82}
 .btns{display:inline-flex;gap:8px;flex-wrap:wrap}
 .btn.ghost{background:#fff0a3;color:var(--navy)}
 .btn.ghost:hover{background:#ffe36b}
+.btn.line{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.btn.line:hover{background:#f3efe4}
 .btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:50px 0;font-size:15px}
 
@@ -170,6 +172,8 @@ const PAPERS = [
     tags: ["機器學習", "股價預測", "圖神經網路", "GAN", "時間序列分解"],
     summary: "只用歷史股價建立 Pearson、Spearman、FastDTW 三種度量 × 全局／局部共 6 張關聯圖，搭配 VMD 分解與 WGAN-GP＋MSE 訓練（Multi-GCN＋GRU 生成器），在 ETF、上證 50、道瓊三個資料集上預測隔日收盤價。",
     paragraphs: 40,
+    intro: "papers/2024-vgc-gan-stock-prediction-intro.html",
+    summary_page: "papers/2024-vgc-gan-stock-prediction-summary.html",
     added: "2026-11-06"
   },
   {
@@ -186,6 +190,7 @@ const PAPERS = [
     summary: "以 KS 檢定剔除訓練／測試分佈不一的特徵來處理資料集偏移，並以深度特徵合成（DFS）補足欠擬合；在保單成交、洗錢偵測、配對交易三個案例中驗證。",
     paragraphs: 54,
     intro: "papers/2022-auto-feature-dataset-shift-intro.html",
+    summary_page: "papers/2022-auto-feature-dataset-shift-summary.html",
     added: "2026-11-06"
   }
 ];
@@ -227,7 +232,7 @@ function render(){
       <div class="tags">${p.tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>
       <div class="foot">
         <span class="stat">${p.paragraphs} 段批注 · 加入於 ${esc(p.added)}</span>
-        <span class="btns">${p.intro ? `<a class="btn ghost" href="${esc(p.intro)}">先看白話導讀</a>` : ""}<a class="btn" href="${esc(p.file)}">閱讀批注 <span aria-hidden="true">→</span></a></span>
+        <span class="btns">${p.intro ? `<a class="btn ghost" href="${esc(p.intro)}">先看導讀</a>` : ""}${p.summary_page ? `<a class="btn line" href="${esc(p.summary_page)}">一頁摘要</a>` : ""}<a class="btn" href="${esc(p.file)}">閱讀批注 <span aria-hidden="true">→</span></a></span>
       </div>
     </article>`).join("") : `<div class="empty">找不到符合的論文</div>`;
 }
